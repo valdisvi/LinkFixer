@@ -99,9 +99,8 @@ public class Utils {
 	public static String getOutput(Process process) {
 		// See
 		// http://web.archive.org/web/20140531042945/https://weblogs.java.net/blog/pat/archive/2004/10/stupid_scanner_1.html
-		try (Scanner s = new Scanner(process.getInputStream()).useDelimiter("\\A")) {
+		Scanner s = new Scanner(process.getInputStream()).useDelimiter("\\A");
 			return s.hasNext() ? s.next() : "";
-		}
 	}
 
 	/**
@@ -109,9 +108,8 @@ public class Utils {
 	 * @return string gathered from the process error output
 	 */
 	public static String getError(Process process) {
-		try (Scanner s = new Scanner(process.getErrorStream()).useDelimiter("\\A")) {
+		Scanner s = new Scanner(process.getErrorStream()).useDelimiter("\\A");
 			return s.hasNext() ? s.next() : "";
-		}
 	}
 
 	public static void sleep(int milliseconds) {
