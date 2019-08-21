@@ -1,14 +1,9 @@
 package org.xwiki4.test;
-import static org.junit.Assert.*;
-
-import java.io.File;
-import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki4.FileManipulation;
 import org.xwiki4.LinkFixer;
-import org.apache.commons.io.FileUtils;
 
 public class LinkFixerTest {
 	
@@ -69,6 +64,31 @@ public class LinkFixerTest {
 		//fix not needed
 		LinkFixer.fixLabel("mailto:noone@nowhere.com");
 		TestUtility.assertFiles(name, "Email", noChange);
+	}
+	
+	@Test
+	public void testImage() {
+		String name = "image.txt";
+		//fix needed
+		LinkFixer.fixImage("https://www.w3schools.com/js/tryit.asp?filename=tryjs_randomlink");
+		TestUtility.assertFiles(name, "Image", noMatch);
+		
+		//fix not needed
+		LinkFixer.fixImage(defaultLink);
+		TestUtility.assertFiles(name, "Image", noChange);
+	}
+	
+	@Test
+	public void testLinkOnImage() {
+		String name = "linkImage.txt";
+		
+		//fix needed
+		LinkFixer.fixLabel("https://odo.lv/Blog/?language=en");
+		TestUtility.assertFiles(name, "LinkImage", noMatch);
+		
+		//fix not needed
+		LinkFixer.fixLabel("https://www.w3schools.com/js/tryit.asp?filename=tryjs_randomlink");
+		TestUtility.assertFiles(name, "LinkImage", noChange);
 	}
 	
 }
