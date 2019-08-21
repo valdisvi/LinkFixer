@@ -23,9 +23,15 @@ public class LinkFixerLargeTest {
 	public void testLarge() {
 		String name = "bible.txt";
 		
-		LinkFixer.fixLabel(defaultLink);
-		LinkFixer.fixExplicit("https://www.xwiki.org");
-		LinkFixer.fixImplicit("https://www.google.com");
+		//need fixing
+		LinkFixer.fixAny(defaultLink);
+		LinkFixer.fixAny("https://www.xwiki.org");
+		LinkFixer.fixAny("https://www.google.com");
+		LinkFixer.fixAny("https://www.w3schools.com/js/tryit.asp?filename=tryjs_randomlink");
+		//don't need fixing
+		LinkFixer.fixExplicit(defaultLink);
+		LinkFixer.fixImplicit(defaultLink);
+		LinkFixer.fixImage(defaultLink);
 		TestUtility.assertFiles(name, "Bible", noMatch);
 	}
 
