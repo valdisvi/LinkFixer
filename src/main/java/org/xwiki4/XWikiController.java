@@ -1,3 +1,4 @@
+package org.xwiki4;
 import java.io.IOException;
 
 import javax.xml.bind.JAXBContext;

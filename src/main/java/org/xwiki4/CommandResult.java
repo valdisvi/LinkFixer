@@ -1,3 +1,4 @@
+package org.xwiki4;
 public class CommandResult {
 	String out;
 	String err;

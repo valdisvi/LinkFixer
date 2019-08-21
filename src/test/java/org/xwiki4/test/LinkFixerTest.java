@@ -1,3 +1,4 @@
+package org.xwiki4.test;
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -5,6 +6,8 @@ import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki4.FileManipulation;
+import org.xwiki4.LinkFixer;
 import org.apache.commons.io.FileUtils;
 
 public class LinkFixerTest {
