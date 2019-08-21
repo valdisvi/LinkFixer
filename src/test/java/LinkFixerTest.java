@@ -15,18 +15,7 @@ public class LinkFixerTest {
 	
 	@Before
 	public void setUp() {
-		LinkFixer.setInput(FileManipulation.readTestFile());
-	}
-
-	private void assertFiles(String name, String user, String message) {
-		FileManipulation.writeTestFile(LinkFixer.getInput(), name);
-		try {
-			assertEquals(user + message,
-					FileUtils.readFileToString(new File("TestTxt/Correct" + user + ".txt"), "utf-8"),
-					FileUtils.readFileToString(new File("TestTxt/" + name), "utf-8"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}		
+		LinkFixer.setInput(FileManipulation.readTestFile("TestTxt/Test1.txt"));
 	}
 	
 	@Test
@@ -35,23 +24,48 @@ public class LinkFixerTest {
 		
 		//fix needed
 		LinkFixer.fixImplicit("https://www.xwiki.org");
-		assertFiles(name, "Implicit", noMatch);
+		TestUtility.assertFiles(name, "Implicit", noMatch);
 		
 		//fix not needed
 		LinkFixer.fixImplicit(defaultLink);
-		assertFiles(name, "Implicit", noChange);
+		TestUtility.assertFiles(name, "Implicit", noChange);
 	}
-	
+		
+	@Test
+	public void testExplicit() {
+		String name = "explicit.txt";
+		//fix needed
+		LinkFixer.fixExplicit("https://www.google.com/");
+		TestUtility.assertFiles(name, "Explicit", noMatch);
+		
+		//fix not needed
+		LinkFixer.fixExplicit(defaultLink);
+		TestUtility.assertFiles(name, "Explicit", noChange);
+	}
+
 	@Test
 	public void testLabel() {
 		String name = "label.txt";
 		//fix needed
 		LinkFixer.fixLabel(defaultLink);
-		assertFiles(name, "Label", noMatch);
+		TestUtility.assertFiles(name, "Label", noMatch);
 
 		//fix not needed
-		LinkFixer.fixLabel(defaultLink);
-		assertFiles(name, "Label", noChange);
+		LinkFixer.fixLabel("https://www.xwiki.org");
+		TestUtility.assertFiles(name, "Label", noChange);
 	}
-
+	
+	//should be fixed by label fixer
+	@Test
+	public void testEmail() {
+		String name = "email.txt";
+		//fix needed
+		LinkFixer.fixLabel("mailto:someone@somewhere.com");
+		TestUtility.assertFiles(name, "Email", noMatch);
+		
+		//fix not needed
+		LinkFixer.fixLabel("mailto:noone@nowhere.com");
+		TestUtility.assertFiles(name, "Email", noChange);
+	}
+	
 }

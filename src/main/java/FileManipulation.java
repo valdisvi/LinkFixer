@@ -20,13 +20,13 @@ public class FileManipulation {
 	}
 	
 	//a simple read
-	public static StringBuffer readTestFile() {	
+	public static StringBuffer readTestFile(String name) {	
 		BufferedReader reader;
 		StringBuffer result = new StringBuffer();
 		int c = 0;
 		
 		try {
-			reader = new BufferedReader(new FileReader(new File("TestTxt/Test1.txt")));
+			reader = new BufferedReader(new FileReader(new File(name)));
 		
 			while((c = reader.read()) != -1) {
 				result.append((char)c);
