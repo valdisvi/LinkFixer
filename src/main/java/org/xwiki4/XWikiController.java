@@ -49,7 +49,7 @@ public class XWikiController {
 	
 	//set page using curl
 	public static void setPage(String url) {
-		String[] parameters = {"curl", "-u", "admin:admin", "-X", "PUT", "-T", "/home/student/Desktop/CurlInfo.txt",
+		String[] parameters = {"curl", "-u", "Admin:admin", "-X", "PUT", "-T", "/home/student/Desktop/CurlInfo.txt",
 				"-H", "Content-Type: text/plain", url};	
 		Utils.executeCmd(parameters);
 	}

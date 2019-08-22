@@ -15,14 +15,14 @@ public class LinkFixer {
 	//plain implicit url
 	//remove it
 	public static void fixImplicit(String badLink) {
-		matchAndReplace("([\\s\n\r\t]){1}(" + correctInput(badLink) + "){1}([\\s\n\r\t]){1}", " ");
+		matchAndReplace("([\\h\n\r\t]){1}(" + correctInput(badLink) + "){1}([\\h\n\r\t]){1}", " ");
 	}
 	
 	//fix explicit
 	//url, but surrounded by [[]]
 	//remove it
 	public static void fixExplicit(String badLink) {
-		matchAndReplace("(\\s)*(\\[)\\2{1}(" + correctInput(badLink) + "){1}(\\])\\4{1}(\\s)*", " ");
+		matchAndReplace("(\\h)*(\\[)\\2{1}(" + correctInput(badLink) + "){1}(\\])\\4{1}(\\h)*", " ");
 	}
 	
 	//fix label file
@@ -31,15 +31,33 @@ public class LinkFixer {
 	//also deals with the form [[image:link>>link]]
 	//delete that one
 	public static void fixLabel(String badLink) {
-		matchAndReplace("((\\s)*(\\[){1}\\3{1}(image:){1}([^\\[]*?)(>>" + correctInput(badLink) + "){1}(\\]){1}\\7{1}(\\s)*){1}", " ");
-		matchAndReplace("((\\s)*(\\[){1}\\3{1}([^\\[]*?)(>>" + correctInput(badLink) + "){1}(\\]){1}\\6{1}(\\s)*){1}", "4");
+		matchAndReplace("((\\h)*(\\[){1}\\3{1}(image:){1}([^\\[]*?)(>>" + correctInput(badLink) + "){1}(\\]){1}\\7{1}(\\h)*){1}", " ");
+		matchAndReplace("((\\h)*(\\[){1}\\3{1}([^\\[]*?)(>>" + correctInput(badLink) + "){1}(\\]){1}\\6{1}(\\h)*){1}", "4");
 	}
 	
 	//fix image
 	//of the form [[image:link]]
 	//remove it
 	public static void fixImage(String badLink) {
-		matchAndReplace("((\\s)*(\\[){1}\\3{1}(image:){1}(" + correctInput(badLink) + "){1}(\\]){1}\\6{1}(\\s)*){1}", " ");
+		matchAndReplace("((\\h)*(\\[){1}\\3{1}(image:){1}(" + correctInput(badLink) + "){1}(\\]){1}\\6{1}(\\h)*){1}", " ");
+	}
+	
+	//fix attach
+	//of the form [[attach:img.png]]
+	//replace it with part before .png
+	public static void fixAttach(String badLink) {
+		//match the part before .png
+		Pattern pattern = Pattern.compile("(.*)(\\.)(.*)");
+		Matcher matcher = pattern.matcher(badLink);
+		matcher.find();
+		matchAndReplace("((\\h)*(\\[){1}\\3{1}(attach:){1}(" + correctInput(badLink) + "){1}(\\]){1}\\6{1}(\\h)*){1}", " " + matcher.group(1) + " ");
+	}
+	
+	//fix new window
+	//of the form [[link||target="_blank"]]
+	//remove it
+	public static void fixNewWindow(String badLink) {
+		matchAndReplace("(\\h)*(\\[)\\2{1}(" + correctInput(badLink) + "){1}(||){1}([^\\[]*?)(\\])\\6{1}(\\h)*", " ");
 	}
 	
 	//decides where the string should go
@@ -50,10 +68,16 @@ public class LinkFixer {
 			Matcher matcher = pattern.matcher(input);
 			matcher.find();
 			if(input.substring(matcher.start()-1, matcher.start()).equals(">")) 		fixLabel(badLink);
-			else if (input.substring(matcher.start()-1, matcher.start()).equals("[")) 	fixExplicit(badLink);
-			else if (input.substring(matcher.start()-1, matcher.start()).equals(":")) 	fixImage(badLink);
+			else if (input.substring(matcher.start()-1, matcher.start()).equals("[") && !input.substring(matcher.start()+1, matcher.start()).equals("|")) 	fixExplicit(badLink);
+			else if(input.substring(matcher.start()-1, matcher.start()).equals("[") && input.substring(matcher.start()+1, matcher.start()).equals("|")) fixNewWindow(badLink);
+			else if (input.substring(matcher.start()-1, matcher.start()).equals(":")) {
+				fixAttach(badLink);
+				fixImage(badLink);
+			} 	
 			else fixImplicit(badLink);
 		} catch(Exception e) {
+			fixNewWindow(badLink);
+			fixAttach(badLink);
 			fixImage(badLink);
 			fixLabel(badLink);
 			fixExplicit(badLink);
