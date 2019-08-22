@@ -91,4 +91,30 @@ public class LinkFixerTest {
 		TestUtility.assertFiles(name, "LinkImage", noChange);
 	}
 	
+	@Test
+	public void testAttach() {
+		String name = "attach.txt";
+		
+		//fix needed
+		LinkFixer.fixAttach("cat.jpg");
+		TestUtility.assertFiles(name, "Attach", noMatch);
+		
+		//fix not needed
+		LinkFixer.fixAttach(defaultLink);
+		TestUtility.assertFiles(name, "Attach", noChange);
+	}
+	
+	@Test
+	public void testNewWindow() {
+		String name = "new";
+		
+		//fix needed
+		LinkFixer.fixNewWindow("https://www.cnet.com/how-to/nine-tools-that-let-you-randomly-browse-the-web/");
+		TestUtility.assertFiles(name, "New", noMatch);
+		
+		//fix not needed
+		LinkFixer.fixNewWindow("https://www.xwiki.org");
+		TestUtility.assertFiles(name, "New", noChange);
+	}
+		
 }
