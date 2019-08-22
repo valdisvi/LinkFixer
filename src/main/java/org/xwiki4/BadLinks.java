@@ -11,8 +11,8 @@ import org.jsoup.select.Elements;
 
 public class BadLinks {
 	
-	private ArrayList<String> parentLinks = new ArrayList<>();
-	private ArrayList<String> realLinks = new ArrayList<>();
+	private ArrayList<String> parentLinks = new ArrayList<String>();
+	private ArrayList<String> realLinks = new ArrayList<String>();
 
 	public void findLinks (String url) throws IOException {
         Document doc = Jsoup.connect(url).get();
