@@ -1,10 +1,15 @@
 package org.xwiki4;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LinkFixer {
 	
 	private static StringBuffer input;
+	private static ArrayList<String> badLinksList;
+	private static ArrayList<String> locationsList;
 				
 	//fix url
 	//plain implicit url
@@ -94,6 +99,27 @@ public class LinkFixer {
 		}
 		
 		return result;
+	}
+	
+	public static void getLinkFixer() {
+		BadLinks badLinks = new BadLinks();
+		try {
+			ClassLoader classLoader = new LinkFixer().getClass().getClassLoader();
+			File file = new File(classLoader.getResource("linkchecker.html").getFile());
+						
+			badLinks.findLinksLocal(file);
+			badLinksList = new ArrayList(badLinks.getParentLinks());
+			locationsList = new ArrayList(badLinks.getRealLinks());
+			
+			//do the actual fixing
+			for(int i = 0; i < badLinksList.size(); i++) {
+				
+			}
+			
+		} catch (IOException e) {
+			System.err.println();
+			e.printStackTrace();
+		}
 	}
 	
 	public static StringBuffer getInput() {

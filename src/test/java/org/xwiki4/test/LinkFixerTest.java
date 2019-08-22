@@ -91,4 +91,9 @@ public class LinkFixerTest {
 		TestUtility.assertFiles(name, "LinkImage", noChange);
 	}
 	
+	@Test
+	public void testHtml() {
+		LinkFixer.getLinkFixer();
+	}
+	
 }

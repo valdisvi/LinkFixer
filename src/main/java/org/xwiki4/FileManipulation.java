@@ -41,4 +41,27 @@ public class FileManipulation {
 		
 		return result;
 	}
+	
+	//a simple read from string
+	public static StringBuffer readString(String name) {	
+		BufferedReader reader;
+		StringBuffer result = new StringBuffer();
+		int c = 0;
+		
+		try {
+			reader = new BufferedReader(new FileReader(name));
+		
+			while((c = reader.read()) != -1) {
+				result.append((char)c);
+			}
+			
+			reader.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
 }
