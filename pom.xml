@@ -52,6 +52,13 @@
 	  <artifactId>jsoup</artifactId>
 	  <version>1.12.1</version>
 	</dependency>
+	
+	<!--  Selenium -->
+	<dependency>
+	    <groupId>org.seleniumhq.selenium</groupId>
+	    <artifactId>selenium-java</artifactId>
+	    <version>3.4.0</version>
+	</dependency>
 
  </dependencies>
 </project>
