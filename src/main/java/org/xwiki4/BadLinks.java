@@ -35,6 +35,11 @@ public class BadLinks {
         		realLinks.add(link.attr("abs:href"));
         }
 	}
+	
+	public int getErrorCount() {
+		return parentLinks.size();
+	}
+	
 	public ArrayList<String> getParentLinks () {
 		return parentLinks;
 	}

@@ -20,6 +20,29 @@ public class FileManipulation {
 		}
 	}
 	
+	//a write to spiecific place
+	public static void writeTo(StringBuffer result, String name) {
+		File file = new File(name);
+		BufferedWriter writer = null;
+		
+		try {
+			writer = new BufferedWriter(new FileWriter(file));
+			writer.write(result.toString());
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			System.err.println("Writing failed");
+			e.printStackTrace();
+		} finally {
+			try {
+				writer.close();
+			} catch (IOException e) {
+				System.err.println("Writing failed");
+				e.printStackTrace();
+			}
+		}		
+	}
+	
 	//a simple read
 	public static StringBuffer readTestFile(String name) {	
 		BufferedReader reader;

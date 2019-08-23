@@ -1,6 +1,7 @@
 package org.xwiki4.test;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xwiki4.FileManipulation;
 import org.xwiki4.LinkFixer;
@@ -116,5 +117,10 @@ public class LinkFixerTest {
 		LinkFixer.fixNewWindow("https://www.xwiki.org");
 		TestUtility.assertFiles(name, "New", noChange);
 	}
-		
+	
+	@Test
+	public void testFixer() {
+		LinkFixer.getLinkFixer();
+	}	
+	
 }

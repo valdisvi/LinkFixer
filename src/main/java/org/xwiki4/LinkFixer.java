@@ -1,9 +1,15 @@
 package org.xwiki4;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.io.FileUtils;
 
 public class LinkFixer {
 	
@@ -67,9 +73,10 @@ public class LinkFixer {
 		try {
 			Matcher matcher = pattern.matcher(input);
 			matcher.find();
+			System.out.println("Found:" + matcher.group().toString());
 			if(input.substring(matcher.start()-1, matcher.start()).equals(">")) 		fixLabel(badLink);
-			else if (input.substring(matcher.start()-1, matcher.start()).equals("[") && !input.substring(matcher.start()+1, matcher.start()).equals("|")) 	fixExplicit(badLink);
-			else if(input.substring(matcher.start()-1, matcher.start()).equals("[") && input.substring(matcher.start()+1, matcher.start()).equals("|")) fixNewWindow(badLink);
+			else if (input.substring(matcher.start()-1, matcher.start()).equals("[") && !input.substring(matcher.start(), matcher.start()+1).equals("|")) 	fixExplicit(badLink);
+			else if(input.substring(matcher.start()-1, matcher.start()).equals("[") && input.substring(matcher.start(), matcher.start()+1).equals("|")) fixNewWindow(badLink);
 			else if (input.substring(matcher.start()-1, matcher.start()).equals(":")) {
 				fixAttach(badLink);
 				fixImage(badLink);
@@ -83,6 +90,13 @@ public class LinkFixer {
 			fixExplicit(badLink);
 			fixImplicit(badLink);
 		}
+			
+			fixNewWindow(badLink);
+			fixAttach(badLink);
+			fixImage(badLink);
+			fixLabel(badLink);
+			fixExplicit(badLink);
+			fixImplicit(badLink);
 	}
 	
 	//does replacements and matching - needs the pattern and the replacement for the pattern
@@ -122,24 +136,59 @@ public class LinkFixer {
 			result = result.replaceAll("\\" + specials.charAt(i), "\\\\\\" + specials.charAt(i));
 		}
 		
+		result.replaceAll("/", "\\/");
+		
 		return result;
 	}
 	
 	public static void getLinkFixer() {
 		BadLinks badLinks = new BadLinks();
+		String restLink;
+		String restTail = "";
+		String[] split;
 		try {
 			ClassLoader classLoader = new LinkFixer().getClass().getClassLoader();
-			File file = new File(classLoader.getResource("linkchecker.html").getFile());
-						
+			//File file = new File(classLoader.getResource("badlinks.html").getFile());
+			File file = new File("src/test/resources/badlinks.html");	
+			
 			badLinks.findLinksLocal(file);
 			badLinksList = new ArrayList(badLinks.getParentLinks());
 			locationsList = new ArrayList(badLinks.getRealLinks());
 			
-			//do the actual fixing
+			System.out.println("Current error count:" + badLinks.getErrorCount());
+			
+			//do the actual fixing			
 			for(int i = 0; i < badLinksList.size(); i++) {
+				
+				//form the rest link
+				split = locationsList.get(i).split("/");
+				restLink = split[0] + "//" + split[2] + "/" + split[3] + "/" + "rest/wikis/xwiki";
+				restTail = "";
+				for(int k = 6; k < split.length; k++) {
+					if(split[k].charAt(0) != '?')
+						restLink += "/spaces/" + split[k];
+					else 
+						restTail = split[k];
+				}
+				
+				//System.out.println("Fixing:" + badLinksList.get(i));
+				
+				restLink += "/pages/WebHome" + restTail;
+				input = new StringBuffer(XWikiController.getPage(restLink));
+				//System.out.print(input);
+				
+				fixAny(badLinksList.get(i));
+				
+				//write the changes to text file
+				FileManipulation.writeTo(input, "src/main/resources/fixResult.txt");
+				
+				//push the changes to XWiki
+				XWikiController.setPage(restLink, "src/main/resources/fixResult.txt");
 				
 			}
 			
+			System.out.println("Done fixing!");
+						
 		} catch (IOException e) {
 			System.err.println();
 			e.printStackTrace();

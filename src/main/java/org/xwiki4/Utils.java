@@ -22,7 +22,7 @@ public class Utils {
 		try {
 			process = runtime.exec(params);
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, e.toString());
+			//logger.log(Level.SEVERE, e.toString());
 		}
 		return process;
 	}
@@ -38,7 +38,7 @@ public class Utils {
 		String error = result.err;
 		String output = result.out;
 		if (!(output.equals("")))
-			logger.log(Level.SEVERE, "executeCmd(" + Arrays.toString(cmd) + ")\nOutput message: " + output);
+			//logger.log(Level.SEVERE, "executeCmd(" + Arrays.toString(cmd) + ")\nOutput message: " + output);
 		if (!error.equals("")) {
 			error += ("Command output error message: " + error);
 			output += error;
@@ -62,17 +62,17 @@ public class Utils {
 			error = getError(pb);
 			pb.waitFor();
 
-			if (!(output.equals("")))
-				logger.log(Level.SEVERE, "executeCmd(" + Arrays.toString(cmd) + ")\nOutput message: " + output);
-			else
-				logger.log(Level.SEVERE, "executeCmd(" + Arrays.toString(cmd) + ") executed successfully");
+			//if (!(output.equals("")))
+				//logger.log(Level.SEVERE, "executeCmd(" + Arrays.toString(cmd) + ")\nOutput message: " + output);
+		//	else
+				//logger.log(Level.SEVERE, "executeCmd(" + Arrays.toString(cmd) + ") executed successfully");
 
 			if (!error.equals(""))
-				logger.log(Level.SEVERE, error);
+				//logger.log(Level.SEVERE, error);
 
 			commandOutput = new CommandResult(output, error);
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, e.toString());
+			//logger.log(Level.SEVERE, e.toString());
 		}
 
 		return commandOutput;
@@ -117,7 +117,7 @@ public class Utils {
 		try {
 			Thread.sleep(milliseconds);
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, e.toString());
+			//logger.log(Level.SEVERE, e.toString());
 		}
 	}
 

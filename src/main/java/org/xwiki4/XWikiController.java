@@ -15,10 +15,9 @@ import org.xwiki.rest.model.jaxb.Page;
 public class XWikiController {
 
 	public static String defaultPage = "http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/TestPageLinkChecker/spaces/SimplePage/pages/WebHome";
-
+	
 	public static void main(String[] args) {
-		getPage(defaultPage);
-		setPage(defaultPage);
+		getPage("");
 	}
 	
 	//get page using JAXB
@@ -37,7 +36,7 @@ public class XWikiController {
 			Page page = (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 				
 			result = new StringBuffer(page.getContent());
-						
+									
 			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -48,8 +47,8 @@ public class XWikiController {
 	}
 	
 	//set page using curl
-	public static void setPage(String url) {
-		String[] parameters = {"curl", "-u", "Admin:admin", "-X", "PUT", "-T", "/home/student/Desktop/CurlInfo.txt",
+	public static void setPage(String url, String place) {
+		String[] parameters = {"curl", "-u", "Admin:admin", "-X", "PUT", "-T", place,
 				"-H", "Content-Type: text/plain", url};	
 		Utils.executeCmd(parameters);
 	}
