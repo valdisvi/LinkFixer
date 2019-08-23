@@ -156,9 +156,9 @@ public class LinkFixer {
 		String restLink;
 		String restTail = "";
 		String[] split;
+		String[] split2;
 		try {
 			ClassLoader classLoader = new LinkFixer().getClass().getClassLoader();
-			//File file = new File(classLoader.getResource("badlinks.html").getFile());
 			File file = new File("src/test/resources/badlinks.html");	
 			
 			badLinks.findLinksLocal(file);
@@ -169,23 +169,28 @@ public class LinkFixer {
 			
 			//do the actual fixing			
 			for(int i = 0; i < badLinksList.size(); i++) {
-								
+						
+				//http://192.168.8.123:8080/xwiki/rest/wikis/xwiki/spaces/Custom/spaces/GnucashHeader/pages/WebHome?showTagAddForm=true#xdocTags
 				//form the rest link
 				split = locationsList.get(i).split("/");
 				restLink = split[0] + "//" + split[2] + "/" + split[3] + "/" + "rest/wikis/xwiki";
 				restTail = "";
 				for(int k = 6; k < split.length; k++) {
-					if(split[k].charAt(0) != '?')
+					if (split[k].contains("?") && split[k].charAt(0) != '?') {
+						split2 = split[k].split("\\?");
+						restLink += "/spaces/" + split2[0];
+						restTail += "?" + split2[1];
+					}
+					else if(split[k].charAt(0) != '?') {
 						restLink += "/spaces/" + split[k];
-					else 
+					}
+					else { 
 						restTail = split[k];
+					}
 				}
-				
-				//System.out.println("Fixing:" + badLinksList.get(i));
-				
+								
 				restLink += "/pages/WebHome" + restTail;
 				input = new StringBuffer(XWikiController.getPage(restLink));
-				//System.out.print(input);
 				
 				fixAny(badLinksList.get(i));
 				
