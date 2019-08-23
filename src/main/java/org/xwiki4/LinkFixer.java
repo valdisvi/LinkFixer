@@ -170,7 +170,6 @@ public class LinkFixer {
 			//do the actual fixing			
 			for(int i = 0; i < badLinksList.size(); i++) {
 						
-				//http://192.168.8.123:8080/xwiki/rest/wikis/xwiki/spaces/Custom/spaces/GnucashHeader/pages/WebHome?showTagAddForm=true#xdocTags
 				//form the rest link
 				split = locationsList.get(i).split("/");
 				restLink = split[0] + "//" + split[2] + "/" + split[3] + "/" + "rest/wikis/xwiki";
