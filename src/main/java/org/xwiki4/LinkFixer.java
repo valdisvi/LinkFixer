@@ -209,6 +209,11 @@ public class LinkFixer {
 		}
 	}
 	
+	public static String HelloWorld() {
+		System.out.println("Print: Hello!");
+		return "Hello!";
+	}
+	
 	public static StringBuffer getInput() {
 		return input;
 	}
