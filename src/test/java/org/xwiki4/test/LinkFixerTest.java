@@ -118,9 +118,4 @@ public class LinkFixerTest {
 		TestUtility.assertFiles(name, "New", noChange);
 	}
 	
-	@Test
-	public void testFixer() {
-		LinkFixer.getLinkFixer();
-	}	
-	
 }

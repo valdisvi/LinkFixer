@@ -43,6 +43,8 @@ public class FileManipulation {
 		}		
 	}
 	
+	
+	
 	//a simple read
 	public static StringBuffer readTestFile(String name) {	
 		BufferedReader reader;
