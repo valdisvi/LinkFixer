@@ -39,7 +39,6 @@ public class XWikiController {
 									
 			return result;
 		} catch (Exception e) {
-			e.printStackTrace();
 			return new StringBuffer();
 		}	
 		

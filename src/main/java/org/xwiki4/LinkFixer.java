@@ -10,15 +10,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class LinkFixer {
 	
 	private static StringBuffer input;
 	private static ArrayList<String> badLinksList;
 	private static ArrayList<String> locationsList;
+	private static boolean found;	//whether a match has been found
 				
 	public static void main(String[] args) {
-		getLinkFixer("/home/edmunds/Desktop/BadLinks.html");
+		getLinkFixer("/home/student/Desktop/badlinks.html");
 	}
 	
 	//fix url
@@ -134,10 +136,12 @@ public class LinkFixer {
 			try {
 				Integer.parseInt(replacement);
 				input = new StringBuffer(matcher.replaceAll(" "+ matcher.group(Integer.parseInt(replacement)) + " "));
+				found = true;
 				System.out.println("Fixed!");
 			} catch (NumberFormatException e) {
 				//not a number just replace
 				input = new StringBuffer(matcher.replaceAll(replacement));
+				found = true;
 				System.out.println("Fixed!");
 			}
 		} catch (IllegalStateException e) {
@@ -161,11 +165,11 @@ public class LinkFixer {
 	
 	public static void getLinkFixer(String inputFile) {
 		BadLinks badLinks = new BadLinks();
-		String restLink;
+		String restLink = "";	//ends with webhome
+		String restLink2 = "";	//ends with last entry in link
 		String restTail = "";
 		String[] split;
 		String[] split2;
-		String result = "";
 		try {
 			File file = new File(inputFile);	
 			
@@ -181,15 +185,22 @@ public class LinkFixer {
 				//form the rest link
 				split = locationsList.get(i).split("/");
 				restLink = split[0] + "//" + split[2] + "/" + split[3] + "/" + "rest/wikis/xwiki";
+				restLink2 = split[0] + "//" + split[2] + "/" + split[3] + "/" + "rest/wikis/xwiki";
 				restTail = "";
 				for(int k = 6; k < split.length; k++) {
+					//note that there are two types of restlinks
+					//split2 is used to append parameters
+					//put with ?
+					//restLink2 mirrors restLink most of the time
 					if (split[k].contains("?") && split[k].charAt(0) != '?') {
 						split2 = split[k].split("\\?");
 						restLink += "/spaces/" + split2[0];
+						restLink2 += "/spaces/" + split2[0];
 						restTail += "?" + split2[1];
 					}
 					else if(split[k].charAt(0) != '?') {
 						restLink += "/spaces/" + split[k];
+						restLink2 += "/spaces/" + split[k];
 					}
 					else { 
 						restTail = split[k];
@@ -197,37 +208,62 @@ public class LinkFixer {
 				}
 								
 				restLink += "/pages/WebHome" + restTail;
-				input = new StringBuffer(XWikiController.getPage(restLink));
+				restLink2 += restTail;
 				
-				fixAny(badLinksList.get(i));
-			
-				split = inputFile.split("\\/");
+				//double reverse to replace last
+				restLink2 = StringUtils.reverse(StringUtils.reverse(restLink2).replaceFirst("secaps", "segap"));
 				
-				result = "/";
+				found = false;
 				
-				for(int k = 0; k < split.length; k++) {
-					if(!split[k].isEmpty() && k != split.length -1 ) {
-						result = result.concat(split[k] + "/");
-					}
+				processData(inputFile, restLink, i);
+				
+				//try with differently formed page if found == false
+				if(found == false) {
+					processData(inputFile, restLink2, i);
 				}
-				
-				result = result.concat("fixResult.txt");
-				
-				//write the changes to text file
-				FileManipulation.writeTo(input, result);
-				
-
-				//push the changes to XWiki
-				XWikiController.setPage(restLink, result);
 				
 			}
 						
 			System.out.println("Done fixing!");
+			
 						
 		} catch (IOException e) {
 			System.err.println();
 			e.printStackTrace();
 		}
+		
+		
+	}
+	
+	//a combination of reading/link fixing/writing
+	public static void processData(String inputFile, String restLink, int index) {
+		
+		String[] split;
+		String result = "";
+		
+		input = new StringBuffer(XWikiController.getPage(restLink));
+		
+		fixAny(badLinksList.get(index));
+	
+		split = inputFile.split("\\/");
+		
+		result = "/";
+		
+		for(int k = 0; k < split.length; k++) {
+			if(!split[k].isEmpty() && k != split.length -1 ) {
+				result = result.concat(split[k] + "/");
+			}
+		}
+		
+		result = result.concat("fixResult.txt");
+		
+		//write the changes to text file
+		FileManipulation.writeTo(input, result);
+		
+
+		//push the changes to XWiki
+		XWikiController.setPage(restLink, result);
+				
 	}
 		
 	public static StringBuffer getInput() {

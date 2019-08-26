@@ -9,7 +9,7 @@ public class LinkChecker {
     	
     	IP = url.split("\\/");
     	    	
-        String[] cmd = {"linkchecker", "-r" + recursion, "--no-warnings", "--ignore-url=((" + IP[0] + "//" + IP[2] + "){1}(.*?)){1}"
+        String[] cmd = {"linkchecker", "-r" + recursion, "--no-warnings", "--ignore-url=^mailto --ignore-url=^http://localhost --ignore-url=^apt --ignore-url=.*?viewer=.*"
         		, "--no-follow-url=.*\\?viewer=.*", "--check-extern", "-ohtml", "-t5", "-Fhtml/" + saveLocation
         		,  url};
         
