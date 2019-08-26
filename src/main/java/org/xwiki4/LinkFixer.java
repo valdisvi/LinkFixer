@@ -170,9 +170,11 @@ public class LinkFixer {
 		String restTail = "";
 		String[] split;
 		String[] split2;
-		try {
-			File file = new File(inputFile);	
+		try {			
+			//don't do anything if file doesn't exists
+			if(FileManipulation.fileExists(inputFile) == false) return;
 			
+			File file = new File(inputFile);
 			badLinks.findLinksLocal(file);
 			badLinksList = new ArrayList(badLinks.getParentLinks());
 			locationsList = new ArrayList(badLinks.getRealLinks());
