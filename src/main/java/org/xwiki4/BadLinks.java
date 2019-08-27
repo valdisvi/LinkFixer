@@ -62,16 +62,12 @@ public class BadLinks {
 	public ArrayList<String> getParentLinks () {
 		return parentLinks;
 	}
+	
 	public ArrayList<String> getRealLinks () {
 		return realLinks;
 	}
+	
 	public ArrayList<String> getUrls () {
 		return urls;
 	}
-	
-	public void printLinks () {
-        for(int i=0; i<realLinks.size(); i++) {
-        	System.out.println("Parent URL: " + parentLinks.get(i) + "  Real URL: " + realLinks.get(i));
-        }
-    }
 }

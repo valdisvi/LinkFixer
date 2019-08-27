@@ -35,6 +35,7 @@ public class BadLinksTest {
 			e.printStackTrace();
 		}
 		Assert.assertEquals(239, badLinks.getErrorCount());
+		Assert.assertEquals(badLinks.getUrls().size(), badLinks.getErrorCount());
 		Assert.assertEquals(badLinks.getParentLinks().size(), badLinks.getRealLinks().size());
 	}
 	
