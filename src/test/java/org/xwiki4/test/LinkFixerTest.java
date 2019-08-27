@@ -6,6 +6,10 @@ import org.junit.Test;
 import org.xwiki4.FileManipulation;
 import org.xwiki4.LinkFixer;
 
+/*
+ * @author Edmunds Ozolins
+ */
+
 public class LinkFixerTest {
 	
 	public static String noMatch = " does not match expected";

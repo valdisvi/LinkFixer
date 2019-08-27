@@ -1,23 +1,27 @@
 package org.xwiki4;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+
+/*
+ * @author Edmunds Ozolins
+ * Uses regex to fix links, which are passed as an html file
+ */
 
 public class LinkFixer {
 	
 	private static StringBuffer input;
 	private static ArrayList<String> badLinksList;
 	private static ArrayList<String> locationsList;
+	private static ArrayList<String> urlsList;
 	private static boolean found;	//whether a match has been found
+	private static boolean fixed; //whether the match has been fixed
+	private static boolean verbose = true; //whether to print out execution info
+	private static String resultFileLocation = "";	//this is the result of the LinkFixer
 				
 	public static void main(String[] args) {
 		getLinkFixer("/home/student/Desktop/badlinks.html");
@@ -101,7 +105,7 @@ public class LinkFixer {
 		try {
 			Matcher matcher = pattern.matcher(input);
 			if (matcher.find()) {
-				System.out.println("Found:" + badLink);
+				if(verbose) System.out.println("Found:" + badLink);
 				fixLabel(badLink);
 				fixNewWindow(badLink);
 				fixAttach(badLink);
@@ -137,12 +141,14 @@ public class LinkFixer {
 				Integer.parseInt(replacement);
 				input = new StringBuffer(matcher.replaceAll(" "+ matcher.group(Integer.parseInt(replacement)) + " "));
 				found = true;
-				System.out.println("Fixed!");
+				if(verbose)System.out.println("Fixed!");
+				fixed = true;
 			} catch (NumberFormatException e) {
 				//not a number just replace
 				input = new StringBuffer(matcher.replaceAll(replacement));
 				found = true;
-				System.out.println("Fixed!");
+				if(verbose)System.out.println("Fixed!");
+				fixed = true;
 			}
 		} catch (IllegalStateException e) {
 			//doesn't match
@@ -170,20 +176,22 @@ public class LinkFixer {
 		String restTail = "";
 		String[] split;
 		String[] split2;
+		File resultFile;
 		try {			
-			//don't do anything if file doesn't exists
+			//don't do anything if file doesn't exist
 			if(FileManipulation.fileExists(inputFile) == false) return;
 			
 			File file = new File(inputFile);
 			badLinks.findLinksLocal(file);
 			badLinksList = new ArrayList(badLinks.getParentLinks());
 			locationsList = new ArrayList(badLinks.getRealLinks());
+			urlsList = new ArrayList(badLinks.getUrls());
 			
-			System.out.println("Current error count:" + badLinks.getErrorCount());
+			if(verbose) System.out.println("XWiki broken links count:" + badLinks.getErrorCount());
 			
 			//do the actual fixing			
 			for(int i = 0; i < badLinksList.size(); i++) {
-						
+									
 				//form the rest link
 				split = locationsList.get(i).split("/");
 				restLink = split[0] + "//" + split[2] + "/" + split[3] + "/" + "rest/wikis/xwiki";
@@ -226,12 +234,15 @@ public class LinkFixer {
 				
 			}
 							
-			System.out.println("Done fixing!");
-			
+			if(verbose) System.out.println("Done fixing!");
 						
 		} catch (IOException e) {
-			System.err.println();
+			System.err.println("LinkFixer exception!");
 			e.printStackTrace();
+		} finally {
+			//clean up the results
+			resultFile = new File(resultFileLocation);
+			resultFile.delete();			
 		}
 		
 		
@@ -241,35 +252,36 @@ public class LinkFixer {
 	public static void processData(String inputFile, String restLink, int index) {
 		
 		String[] split;
-		String result = "";
-		File resultFile;
 		
 		input = new StringBuffer(XWikiController.getPage(restLink));
 		
-		fixAny(badLinksList.get(index));
+		fixed = false;
+		
+		//switches between url and real url
+		//if no fix has been made
+		fixAny(urlsList.get(index));
+		if(fixed == false) fixAny(badLinksList.get(index));
 	
 		split = inputFile.split("\\/");
 		
-		result = "/";
+		resultFileLocation = "/";
 		
 		for(int k = 0; k < split.length; k++) {
 			if(!split[k].isEmpty() && k != split.length -1 ) {
-				result = result.concat(split[k] + "/");
+				resultFileLocation = resultFileLocation.concat(split[k] + "/");
 			}
 		}
 		
-		result = result.concat("fixResult.txt");
+		resultFileLocation = resultFileLocation.concat("fixResult.txt");
 		
-		//write the changes to text file
-		FileManipulation.writeTo(input, result);
-		
+		//don't write if empty
+		if(input.length() > 0) {
+			//write the changes to text file
+			FileManipulation.writeTo(input, resultFileLocation);
+			//push the changes to XWiki
+			XWikiController.setPage(restLink, resultFileLocation);
+		}
 
-		//push the changes to XWiki
-		XWikiController.setPage(restLink, result);
-		
-		//clean up the results
-		resultFile = new File(result);
-		resultFile.delete();
 	}
 		
 	public static StringBuffer getInput() {
@@ -278,6 +290,14 @@ public class LinkFixer {
 	
 	public static void setInput(StringBuffer inputIn) {
 		input = inputIn;
+	}
+	
+	public static boolean getVerbose() {
+		return verbose;
+	}
+	
+	public static void setVerbose(boolean value) {
+		verbose = value;
 	}
 			
 }

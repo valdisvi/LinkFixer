@@ -1,17 +1,18 @@
 package org.xwiki4;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.xwiki.rest.model.jaxb.Page;
 
+/*
+ * @author Edmunds Ozolins
+ * Manages input/output to the XWiki
+ * input is done by Jaxb
+ * output is done by Curl
+ */
 public class XWikiController {
 
 	public static String defaultPage = "http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/TestPageLinkChecker/spaces/SimplePage/pages/WebHome";
@@ -39,7 +40,7 @@ public class XWikiController {
 									
 			return result;
 		} catch (Exception e) {
-			System.out.println("Couldn't open:" + url);
+			if(LinkFixer.getVerbose()) System.out.println("Couldn't open:" + url);
 			return new StringBuffer();
 		}	
 		

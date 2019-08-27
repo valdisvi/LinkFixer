@@ -6,6 +6,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/*
+ * A variety of different file manipulation utilities
+ */
 public class FileManipulation {
 	
 	//a simple write

@@ -1,11 +1,13 @@
 package org.xwiki4.test;
-import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki4.FileManipulation;
 import org.xwiki4.LinkFixer;
 
+/*
+ * @author Edmunds Ozolins
+ */
 public class LinkFixerLargeTest {
 
 	public static String noMatch = " does not match expected";
