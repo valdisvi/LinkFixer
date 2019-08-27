@@ -6,4 +6,5 @@ The job is to create a Java application that calls linkcheker (if necessary), an
 2) Install LinkChecker
 3) Install Curl
 4) Import LinkFixer.WebHome.xar in the XWiki
-5) Use [your_site]/xwiki/bin/view/LinkFixer/GUI for fixing broken links
+5) Ensure that there are necessary rights to change the links
+6) Use [your_site]/xwiki/bin/view/LinkFixer/GUI for fixing broken links
