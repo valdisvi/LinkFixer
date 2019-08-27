@@ -14,6 +14,7 @@ public class BadLinks {
 	
 	private ArrayList<String> parentLinks = new ArrayList<String>();
 	private ArrayList<String> realLinks = new ArrayList<String>();
+	private ArrayList<String> urls = new ArrayList<String>();
 
 	public void findLinks (String url) throws IOException {
         Document doc = Jsoup.connect(url).get();
@@ -24,6 +25,7 @@ public class BadLinks {
         	else
         		realLinks.add(link.attr("abs:href"));
         }
+        findUrls(url);
 	}
 	public void findLinksLocal (File url) throws IOException {
         Document doc = Jsoup.parse(url, "UTF-8", "");
@@ -33,6 +35,23 @@ public class BadLinks {
         		parentLinks.add(link.attr("abs:href"));
         	else
         		realLinks.add(link.attr("abs:href"));
+        }
+        findUrlsLocal(url);
+	}
+	
+	public void findUrls (String html) throws IOException {
+        Document doc = Jsoup.connect(html).get();
+        Elements urls = doc.select("td.url:nth-child(2)");
+        for (Element url : urls) {
+        	this.urls.add(url.text().replaceAll("[`']", ""));
+        }
+	}
+	
+	public void findUrlsLocal (File html) throws IOException {
+		Document doc = Jsoup.parse(html, "UTF-8", "");
+        Elements urls = doc.select("td.url:nth-child(2)");
+        for (Element url : urls) {
+        	this.urls.add(url.text().replaceAll("[`']", ""));
         }
 	}
 	
@@ -46,6 +65,10 @@ public class BadLinks {
 	public ArrayList<String> getRealLinks () {
 		return realLinks;
 	}
+	public ArrayList<String> getUrls () {
+		return urls;
+	}
+	
 	public void printLinks () {
         for(int i=0; i<realLinks.size(); i++) {
         	System.out.println("Parent URL: " + parentLinks.get(i) + "  Real URL: " + realLinks.get(i));
