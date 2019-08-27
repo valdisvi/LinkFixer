@@ -1,10 +1,13 @@
 package org.xwiki4;
 
+import java.nio.charset.StandardCharsets;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.io.IOUtils;
 import org.xwiki.rest.model.jaxb.Page;
 
 /*
@@ -24,7 +27,7 @@ public class XWikiController {
 	//get page using JAXB
 	public static StringBuffer getPage(String url) {
 		
-		StringBuffer result;
+		StringBuffer result = new StringBuffer();
 		
 		try {
 			HttpClient httpClient = new HttpClient();
@@ -37,7 +40,7 @@ public class XWikiController {
 			Page page = (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 				
 			result = new StringBuffer(page.getContent());
-									
+			
 			return result;
 		} catch (Exception e) {
 			if(LinkFixer.getVerbose()) System.out.println("Couldn't open:" + url);

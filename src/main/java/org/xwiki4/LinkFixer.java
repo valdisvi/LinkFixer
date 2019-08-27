@@ -2,10 +2,15 @@ package org.xwiki4;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /*
  * @author Edmunds Ozolins
@@ -20,7 +25,8 @@ public class LinkFixer {
 	private static ArrayList<String> urlsList;
 	private static boolean found;	//whether a match has been found
 	private static boolean fixed; //whether the match has been fixed
-	private static boolean verbose = true; //whether to print out execution info
+	private static boolean verbose = false; //whether to print out execution info
+	private static boolean dontChange = false;
 	private static String resultFileLocation = "";	//this is the result of the LinkFixer
 				
 	public static void main(String[] args) {
@@ -120,6 +126,21 @@ public class LinkFixer {
 			
 	}
 	
+	//remove ~ where ~ is located between [[]]
+	//also take care that the tilde is contained on the right side not the left
+	//as in there may be a label with tilde [[~label>>link]]
+	public static void sanitizeTildeSymbol() {
+		Pattern pattern = Pattern.compile("((\\[\\[){1}([^\\[]*)(~){1}([^>^:]*)(\\]\\]){1})+", Pattern.CASE_INSENSITIVE);	
+		Matcher matcher = pattern.matcher(input);
+		
+		try {
+			matcher.find();
+			input = new StringBuffer(matcher.replaceAll("$2$3$5$6"));
+		} catch (IllegalStateException e) {
+			//doesn't match
+		}
+	}
+	
 	//does replacements and matching - needs the pattern and the replacement for the pattern
 	//can pass an int X as a number to specify that X found group is the replacement 
 	private static void matchAndReplace(String stringPattern, String replacement) {
@@ -128,8 +149,7 @@ public class LinkFixer {
 		try {
 			Matcher matcher = pattern.matcher(input);
 			matcher.find();
-			
-						
+								
 			//restore newlines			
 			if(matcher.group(1) != null && matcher.group(1).toString().equals("\n")) replacement = "\n ";
 			if(matcher.group(3) != null && matcher.group(3).toString().equals("\n")) replacement = " \n";
@@ -191,7 +211,11 @@ public class LinkFixer {
 			
 			//do the actual fixing			
 			for(int i = 0; i < badLinksList.size(); i++) {
-									
+				
+				if(badLinksList.get(i).equals("https://www.slant.co/topics/425/best-git-web-interfaces")) {
+					i++; i--;
+				}
+				
 				//form the rest link
 				split = locationsList.get(i).split("/");
 				restLink = split[0] + "//" + split[2] + "/" + split[3] + "/" + "rest/wikis/xwiki";
@@ -225,11 +249,19 @@ public class LinkFixer {
 				
 				found = false;
 				
-				processData(inputFile, restLink, i);
-				
+				processData(inputFile, restLink, i, false);
 				//try with differently formed page if found == false
 				if(found == false) {
-					processData(inputFile, restLink2, i);
+					processData(inputFile, restLink2, i, false);
+				}
+				
+				//if still false then sanitize ~
+				if(found == false) {
+					processData(inputFile, restLink, i, true);
+					//try with differently formed page if found == false
+					if(found == false) {
+						processData(inputFile, restLink2, i, true);
+					}
 				}
 				
 			}
@@ -249,19 +281,20 @@ public class LinkFixer {
 	}
 	
 	//a combination of reading/link fixing/writing
-	public static void processData(String inputFile, String restLink, int index) {
+	public static void processData(String inputFile, String restLink, int index, boolean sanitize) {
 		
 		String[] split;
 		
 		input = new StringBuffer(XWikiController.getPage(restLink));
+		if(sanitize) sanitizeTildeSymbol();
 		
 		fixed = false;
-		
+								
 		//switches between url and real url
 		//if no fix has been made
 		fixAny(urlsList.get(index));
 		if(fixed == false) fixAny(badLinksList.get(index));
-	
+					
 		split = inputFile.split("\\/");
 		
 		resultFileLocation = "/";
@@ -275,7 +308,7 @@ public class LinkFixer {
 		resultFileLocation = resultFileLocation.concat("fixResult.txt");
 		
 		//don't write if empty
-		if(input.length() > 0) {
+		if(input.length() > 0 && fixed==true && dontChange == false) {
 			//write the changes to text file
 			FileManipulation.writeTo(input, resultFileLocation);
 			//push the changes to XWiki
@@ -283,7 +316,7 @@ public class LinkFixer {
 		}
 
 	}
-		
+			
 	public static StringBuffer getInput() {
 		return input;
 	}
@@ -298,6 +331,14 @@ public class LinkFixer {
 	
 	public static void setVerbose(boolean value) {
 		verbose = value;
+	}
+	
+	public static boolean getDontChange() {
+		return dontChange;
+	}
+	
+	public static void setDontChange(boolean value) {
+		dontChange = value;
 	}
 			
 }

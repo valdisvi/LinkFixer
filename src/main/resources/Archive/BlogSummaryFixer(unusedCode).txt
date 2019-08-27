@@ -1,0 +1,55 @@
+//this failed, but it is able to acquire children(blog entries) from
+//a page with several listed blog entries
+
+	        //fix links in blog summaries
+		//get all visible entries in current page and
+		//try to fix the summaries
+		if(blogSummaryFixing == true && fixed == false && restLink.contains("Blog")) {
+			List<String> children = getBlogChildren(location);
+			
+			i = 0;
+			while(fixed == false && i < children.size()) {
+				tmpLink = restLink.replaceAll("WebHome", children.get(i++));
+				tmpLink += "/objects";
+				input = new StringBuffer(XWikiController.getPage(tmpLink));
+				fixAny(urlsList.get(index));
+				if(fixed == false) fixAny(badLinksList.get(index));
+			}
+			
+			restLink = tmpLink;
+			
+		}
+
+
+//blog children are of the class .blogDay
+	public static List<String> getBlogChildren(String location){
+		List<String> result = new ArrayList<String>();
+		Document doc;
+		String[] split;
+		try {
+			
+			doc = Jsoup.connect(location).get();
+			Elements blogEntries = doc.select(".blogDay");
+			Elements internalLink;
+			Elements a;
+			
+			for (Element entry : blogEntries) {
+				internalLink = entry.select(".wikiinternallink");
+				a = internalLink.first().select("a");
+				result.add(a.attr("href"));
+			}
+			
+		} catch (IOException e) {
+			System.err.println("Blog summary fixing failed!");
+			e.printStackTrace();
+		}
+		
+		//only let the last element stay
+		//which is the ID
+		for(int i = 0; i < result.size(); i++) {
+			split = result.get(i).split("/");
+			result.set(i, split[split.length-1]);
+		}
+		
+		return result;
+	}

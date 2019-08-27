@@ -1,0 +1,1 @@
+ getFixer test successful 

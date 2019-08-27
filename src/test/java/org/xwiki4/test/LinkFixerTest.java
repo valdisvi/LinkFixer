@@ -111,7 +111,7 @@ public class LinkFixerTest {
 	
 	@Test
 	public void testNewWindow() {
-		String name = "new";
+		String name = "new.txt";
 		
 		//fix needed
 		LinkFixer.fixNewWindow("https://www.cnet.com/how-to/nine-tools-that-let-you-randomly-browse-the-web/");
@@ -120,6 +120,31 @@ public class LinkFixerTest {
 		//fix not needed
 		LinkFixer.fixNewWindow("https://www.xwiki.org");
 		TestUtility.assertFiles(name, "New", noChange);
+	}
+	
+	@Test
+	public void testURL() {
+		String name = "url.txt";
+		
+		//fix needed
+		LinkFixer.fixUrl("http://www.badlink.org");
+		TestUtility.assertFiles(name, "URL", noMatch);
+		
+		//fix not needed
+		LinkFixer.fixUrl(defaultLink);
+		TestUtility.assertFiles(name, "URL", noChange);
+	}
+	
+	//note that this test requires that Main.GetFixer.WebHome.xar
+	//is set up on the local XWiki
+	//don't write to XWiki anything, just check the changed result
+	@Test
+	public void testGetFixer() {
+		LinkFixer.setDontChange(true);
+		LinkFixer.getLinkFixer("TestTxt/" + "badlinks.html");
+		FileManipulation.writeTo(LinkFixer.getInput(), "TestTxt/" + "getFixerResult.txt");
+		TestUtility.assertFiles("getFixerResult.txt", "GetFixer", "GetFixer test failed, check that Main.GetFixer.WebHome.xar is set up on the local XWiki");
+		LinkFixer.setDontChange(false);
 	}
 	
 }
