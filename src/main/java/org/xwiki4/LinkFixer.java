@@ -225,7 +225,7 @@ public class LinkFixer {
 				}
 				
 			}
-						
+							
 			System.out.println("Done fixing!");
 			
 						
@@ -242,6 +242,7 @@ public class LinkFixer {
 		
 		String[] split;
 		String result = "";
+		File resultFile;
 		
 		input = new StringBuffer(XWikiController.getPage(restLink));
 		
@@ -265,7 +266,10 @@ public class LinkFixer {
 
 		//push the changes to XWiki
 		XWikiController.setPage(restLink, result);
-				
+		
+		//clean up the results
+		resultFile = new File(result);
+		resultFile.delete();
 	}
 		
 	public static StringBuffer getInput() {

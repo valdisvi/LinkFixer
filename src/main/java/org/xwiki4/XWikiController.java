@@ -39,6 +39,7 @@ public class XWikiController {
 									
 			return result;
 		} catch (Exception e) {
+			System.out.println("Couldn't open:" + url);
 			return new StringBuffer();
 		}	
 		

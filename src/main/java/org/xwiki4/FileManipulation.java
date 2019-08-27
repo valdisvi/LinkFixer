@@ -99,4 +99,9 @@ public class FileManipulation {
 		}
 	}
 	
+	//delete file
+	public static void deleteFile(String name) {
+		
+	}
+	
 }
