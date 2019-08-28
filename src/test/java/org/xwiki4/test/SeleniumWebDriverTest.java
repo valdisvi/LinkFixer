@@ -7,7 +7,6 @@ import org.junit.After;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -34,10 +33,7 @@ public class SeleniumWebDriverTest {
   
   @Test
   public void linkFixerGUI() {
-    driver.get("http://localhost:8080/xwiki/bin/view/Main/");
-    driver.manage().window().setSize(new Dimension(1600, 851));
-    driver.findElement(By.cssSelector("#document\\3Axwiki\\3ALinkFixer\\.WebHome > .jstree-icon")).click();
-    driver.findElement(By.id("document:xwiki:LinkFixer.GUI.WebHome_anchor")).click();
+    driver.get("http://localhost:8080/xwiki/bin/view/LinkFixer/GUI/");
     driver.findElement(By.xpath("//div[@id=\'xwikicontent\']/p[3]/div/div")).click();
     {
       WebElement element = driver.findElement(By.xpath("//body[@id=\'body\']/div[2]/div/div[2]/span"));
