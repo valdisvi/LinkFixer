@@ -27,7 +27,7 @@ public class LinkFixer {
 	private static ArrayList<String> translations; //viable translations
 	private static boolean found;	//whether a match has been found
 	private static boolean fixed; //whether the match has been fixed
-	private static boolean verbose = false; //whether to print out execution info
+	private static boolean verbose = true; //whether to print out execution info
 	private static boolean dontChange = false;
 	private static String resultFileLocation = "";	//this is the result of the LinkFixer
 				
@@ -311,7 +311,7 @@ public class LinkFixer {
 								
 		//switches between url and real url
 		//if no fix has been made
-		if(badLinksList.get(index).contains("ftp")) {
+		if(badLinksList.get(index).contains("ftp") || badLinksList.get(index).contains(".")) {
 			fixFTP(namesList.get(index));
 			
 			//try the translation page
