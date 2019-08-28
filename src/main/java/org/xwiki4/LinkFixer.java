@@ -324,7 +324,9 @@ public class LinkFixer {
 					}
 				}
 			}
-		} else {
+		}
+		
+		if(fixed == false) {
 			fixAny(urlsList.get(index));
 			if(fixed == false) fixAny(badLinksList.get(index));
 			
