@@ -23,6 +23,8 @@ public class LinkFixer {
 	private static ArrayList<String> badLinksList;
 	private static ArrayList<String> locationsList;
 	private static ArrayList<String> urlsList;
+	private static ArrayList<String> namesList;
+	private static ArrayList<String> translations; //viable translations
 	private static boolean found;	//whether a match has been found
 	private static boolean fixed; //whether the match has been fixed
 	private static boolean verbose = false; //whether to print out execution info
@@ -104,6 +106,24 @@ public class LinkFixer {
 		matchAndReplace("(\\h)*(\\[)\\2{1}([^\\[]*?)(" + correctInput(badLink) + "){1}(||){1}([^\\[]*?)(\\])\\7{1}(\\h)*", " ");
 	}
 	
+	//fix ftp
+	//of the form {{some file="location"}}
+	//replace with name
+	public static void fixFTP(String badLink) {
+		Pattern pattern = Pattern.compile("(" + correctInput(badLink) + "){1}", Pattern.CASE_INSENSITIVE);	
+		try {
+			Matcher matcher = pattern.matcher(input);
+			if (matcher.find()) {
+				if(verbose) System.out.println("Found:" + badLink);
+				String[] split;
+				split = badLink.split("/");
+				matchAndReplace("(\\h)*(\\{)\\2{1}([^{]*?)=\"([^{]*?)(" + correctInput(badLink) + "){1}\"(\\/)?(\\})\\7{1}(\\h)*", " " + split[split.length-1] + " ");
+			}
+		} catch (Exception e) {
+			//nothing
+		}
+	}
+	
 	//decides where the string should go
 	public static void fixAny(String badLink) {
 		
@@ -111,7 +131,7 @@ public class LinkFixer {
 		try {
 			Matcher matcher = pattern.matcher(input);
 			if (matcher.find()) {
-				if(verbose) System.out.println("Found:" + badLink);
+				if(verbose) System.out.println("Found:" + badLink);				
 				fixLabel(badLink);
 				fixNewWindow(badLink);
 				fixAttach(badLink);
@@ -201,21 +221,20 @@ public class LinkFixer {
 			//don't do anything if file doesn't exist
 			if(FileManipulation.fileExists(inputFile) == false) return;
 			
+			initiateTranslations();
+			
 			File file = new File(inputFile);
 			badLinks.findLinksLocal(file);
 			badLinksList = new ArrayList(badLinks.getParentLinks());
 			locationsList = new ArrayList(badLinks.getRealLinks());
 			urlsList = new ArrayList(badLinks.getUrls());
+			namesList = new ArrayList(badLinks.getNames());
 			
 			if(verbose) System.out.println("XWiki broken links count:" + badLinks.getErrorCount());
 			
 			//do the actual fixing			
 			for(int i = 0; i < badLinksList.size(); i++) {
-				
-				if(badLinksList.get(i).equals("https://www.slant.co/topics/425/best-git-web-interfaces")) {
-					i++; i--;
-				}
-				
+								
 				//form the rest link
 				split = locationsList.get(i).split("/");
 				restLink = split[0] + "//" + split[2] + "/" + split[3] + "/" + "rest/wikis/xwiki";
@@ -292,9 +311,37 @@ public class LinkFixer {
 								
 		//switches between url and real url
 		//if no fix has been made
-		fixAny(urlsList.get(index));
-		if(fixed == false) fixAny(badLinksList.get(index));
-					
+		if(badLinksList.get(index).contains("ftp")) {
+			fixFTP(namesList.get(index));
+			
+			//try the translation page
+			if(fixed == false) {
+				for(String translation : translations) {
+					if(fixed == false) {
+						restLink = restLink + "/translations/" + translation;
+						input = new StringBuffer(XWikiController.getPage(restLink));
+						fixFTP(namesList.get(index));
+					}
+				}
+			}
+		} else {
+			fixAny(urlsList.get(index));
+			if(fixed == false) fixAny(badLinksList.get(index));
+			
+			//try the translation page
+			if(fixed == false) {
+				for(String translation : translations) {
+					if(fixed == false) {
+						restLink = restLink + "/translations/" + translation;
+						input = new StringBuffer(XWikiController.getPage(restLink));
+						fixAny(urlsList.get(index));
+						if(fixed == false) fixAny(badLinksList.get(index));
+					}
+				}
+			}
+			
+		}
+		
 		split = inputFile.split("\\/");
 		
 		resultFileLocation = "/";
@@ -315,6 +362,13 @@ public class LinkFixer {
 			XWikiController.setPage(restLink, resultFileLocation);
 		}
 
+	}
+	
+	
+	public static void initiateTranslations() {
+		translations = new ArrayList<String>();
+		translations.add("en");
+		translations.add("ru");
 	}
 			
 	public static StringBuffer getInput() {

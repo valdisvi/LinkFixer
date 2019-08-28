@@ -135,6 +135,20 @@ public class LinkFixerTest {
 		TestUtility.assertFiles(name, "URL", noChange);
 	}
 	
+	@Test
+	public void testFTP() {
+		String name = "ftp.txt";
+		
+		//fix needed
+		LinkFixer.fixFTP("mystuff.zip");
+		TestUtility.assertFiles(name, "FTP", noMatch);
+		
+		//fix not needed
+		LinkFixer.fixFTP("http://www.badlink.org");
+		TestUtility.assertFiles(name, "FTP", noChange);
+		
+	}
+	
 	//note that this test requires that Main.GetFixer.WebHome.xar
 	//is set up on the local XWiki
 	//don't write to XWiki anything, just check the changed result

@@ -38,7 +38,7 @@ public class XWikiController {
 			getMethod.addRequestHeader("Accept", "application/xml");
 			httpClient.executeMethod(getMethod);
 			Page page = (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-				
+							
 			result = new StringBuffer(page.getContent());
 			
 			return result;
