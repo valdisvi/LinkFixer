@@ -262,19 +262,10 @@ public class LinkFixer {
 
 				found = false;
 
-				processData(inputFile, restLink, username, password, i, false);
+				processData(inputFile, restLink, username, password, i);
 				// try with differently formed page if found == false
 				if (found == false) {
-					processData(inputFile, restLink2, username, password, i, false);
-				}
-
-				// if still false then sanitize ~
-				if (found == false) {
-					processData(inputFile, restLink, username, password, i, true);
-					// try with differently formed page if found == false
-					if (found == false) {
-						processData(inputFile, restLink2, username, password, i, true);
-					}
+					processData(inputFile, restLink2, username, password, i);
 				}
 
 			}
@@ -294,8 +285,7 @@ public class LinkFixer {
 	}
 
 	// a combination of reading/link fixing/writing
-	public static void processData(String inputFile, String restLink, String username, String password, int index,
-			boolean sanitize) {
+	public static void processData(String inputFile, String restLink, String username, String password, int index) {
 
 		String[] split;
 		String translationLink;
@@ -304,10 +294,6 @@ public class LinkFixer {
 
 		fixed = false;
 
-		if (badLinksList.get(index).contains("ftp") || badLinksList.get(index).contains(".")) {
-			fixFTP(namesList.get(index));
-		}
-
 		// switches between url and real url
 		// if no fix has been made
 		if (fixed == false) {
@@ -315,6 +301,12 @@ public class LinkFixer {
 			fixAny(urlsList.get(index));
 			if (fixed == false)
 				fixAny(badLinksList.get(index));
+		}
+
+		if (fixed == false) {
+			if (badLinksList.get(index).contains("ftp") || badLinksList.get(index).contains(".")) {
+				fixFTP(namesList.get(index));
+			}
 		}
 
 		split = inputFile.split("\\/");
