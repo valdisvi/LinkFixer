@@ -1,4 +1,5 @@
 package org.xwiki4.test;
+
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -7,6 +8,10 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.xwiki4.FileManipulation;
 import org.xwiki4.LinkFixer;
+
+/*
+ * @author Edmunds Ozolins
+ */
 
 public class TestUtility {
 
@@ -18,7 +23,7 @@ public class TestUtility {
 					FileUtils.readFileToString(new File("TestTxt/" + name), "utf-8"));
 		} catch (IOException e) {
 			e.printStackTrace();
-		}		
+		}
 	}
-	
+
 }

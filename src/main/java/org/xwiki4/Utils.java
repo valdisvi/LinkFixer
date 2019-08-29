@@ -1,4 +1,5 @@
 package org.xwiki4;
+
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -22,7 +23,7 @@ public class Utils {
 		try {
 			process = runtime.exec(params);
 		} catch (Exception e) {
-			//logger.log(Level.SEVERE, e.toString());
+			// logger.log(Level.SEVERE, e.toString());
 		}
 		return process;
 	}
@@ -38,11 +39,12 @@ public class Utils {
 		String error = result.err;
 		String output = result.out;
 		if (!(output.equals("")))
-			//logger.log(Level.SEVERE, "executeCmd(" + Arrays.toString(cmd) + ")\nOutput message: " + output);
-		if (!error.equals("")) {
-			error += ("Command output error message: " + error);
-			output += error;
-		}
+			// logger.log(Level.SEVERE, "executeCmd(" + Arrays.toString(cmd) + ")\nOutput
+			// message: " + output);
+			if (!error.equals("")) {
+				error += ("Command output error message: " + error);
+				output += error;
+			}
 		return output;
 	}
 
@@ -62,17 +64,19 @@ public class Utils {
 			error = getError(pb);
 			pb.waitFor();
 
-			//if (!(output.equals("")))
-				//logger.log(Level.SEVERE, "executeCmd(" + Arrays.toString(cmd) + ")\nOutput message: " + output);
-		//	else
-				//logger.log(Level.SEVERE, "executeCmd(" + Arrays.toString(cmd) + ") executed successfully");
+			// if (!(output.equals("")))
+			// logger.log(Level.SEVERE, "executeCmd(" + Arrays.toString(cmd) + ")\nOutput
+			// message: " + output);
+			// else
+			// logger.log(Level.SEVERE, "executeCmd(" + Arrays.toString(cmd) + ") executed
+			// successfully");
 
 			if (!error.equals(""))
-				//logger.log(Level.SEVERE, error);
+				// logger.log(Level.SEVERE, error);
 
-			commandOutput = new CommandResult(output, error);
+				commandOutput = new CommandResult(output, error);
 		} catch (Exception e) {
-			//logger.log(Level.SEVERE, e.toString());
+			// logger.log(Level.SEVERE, e.toString());
 		}
 
 		return commandOutput;
@@ -101,7 +105,7 @@ public class Utils {
 		// See
 		// http://web.archive.org/web/20140531042945/https://weblogs.java.net/blog/pat/archive/2004/10/stupid_scanner_1.html
 		Scanner s = new Scanner(process.getInputStream()).useDelimiter("\\A");
-			return s.hasNext() ? s.next() : "";
+		return s.hasNext() ? s.next() : "";
 	}
 
 	/**
@@ -110,16 +114,15 @@ public class Utils {
 	 */
 	public static String getError(Process process) {
 		Scanner s = new Scanner(process.getErrorStream()).useDelimiter("\\A");
-			return s.hasNext() ? s.next() : "";
+		return s.hasNext() ? s.next() : "";
 	}
 
 	public static void sleep(int milliseconds) {
 		try {
 			Thread.sleep(milliseconds);
 		} catch (Exception e) {
-			//logger.log(Level.SEVERE, e.toString());
+			// logger.log(Level.SEVERE, e.toString());
 		}
 	}
 
 }
-

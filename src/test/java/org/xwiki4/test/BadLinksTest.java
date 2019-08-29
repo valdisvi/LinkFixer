@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.xwiki4.BadLinks;
 
-
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BadLinksTest {
 
@@ -25,7 +24,7 @@ public class BadLinksTest {
 		Assert.assertEquals(badLinks.getUrls().size(), badLinks.getNames().size());
 		Assert.assertEquals(badLinks.getParentLinks().size(), badLinks.getRealLinks().size());
 	}
-	
+
 	@Test
 	public void test02FindLinksLocal() {
 		BadLinks badLinks = new BadLinks();
@@ -40,6 +39,5 @@ public class BadLinksTest {
 		Assert.assertEquals(badLinks.getUrls().size(), badLinks.getNames().size());
 		Assert.assertEquals(badLinks.getParentLinks().size(), badLinks.getRealLinks().size());
 	}
-	
 
 }
