@@ -19,7 +19,6 @@ public class LinkFixer {
 	private static ArrayList<String> locationsList;
 	private static ArrayList<String> urlsList;
 	private static ArrayList<String> namesList;
-	private static ArrayList<String> translations; // viable translations
 	private static boolean found; // whether a match has been found
 	private static boolean fixed; // whether the match has been fixed
 	private static boolean verbose = false; // whether to print out execution info
@@ -150,22 +149,6 @@ public class LinkFixer {
 
 	}
 
-	// remove ~ where ~ is located between [[]]
-	// also take care that the tilde is contained on the right side not the left
-	// as in there may be a label with tilde [[~label>>link]]
-	public static void sanitizeTildeSymbol() {
-		Pattern pattern = Pattern.compile("((\\[\\[){1}([^\\[]*)(~){1}([^>^:]*)(\\]\\]){1})+",
-				Pattern.CASE_INSENSITIVE);
-		Matcher matcher = pattern.matcher(input);
-
-		try {
-			matcher.find();
-			input = new StringBuffer(matcher.replaceAll("$2$3$5$6"));
-		} catch (IllegalStateException e) {
-			// doesn't match
-		}
-	}
-
 	// does replacements and matching - needs the pattern and the replacement for
 	// the pattern
 	// can pass an int X as a number to specify that X found group is the
@@ -234,8 +217,6 @@ public class LinkFixer {
 			// don't do anything if file doesn't exist
 			if (FileManipulation.fileExists(inputFile) == false)
 				return;
-
-			initiateTranslations();
 
 			File file = new File(inputFile);
 			badLinks.findLinksLocal(file);
@@ -320,47 +301,20 @@ public class LinkFixer {
 		String translationLink;
 
 		input = new StringBuffer(XWikiController.getPage(restLink));
-		if (sanitize)
-			sanitizeTildeSymbol();
 
 		fixed = false;
 
-		// switches between url and real url
-		// if no fix has been made
 		if (badLinksList.get(index).contains("ftp") || badLinksList.get(index).contains(".")) {
 			fixFTP(namesList.get(index));
-
-			// try the translation page
-			if (fixed == false) {
-				for (String translation : translations) {
-					if (fixed == false) {
-						translationLink = restLink + "/translations/" + translation;
-						input = new StringBuffer(XWikiController.getPage(translationLink));
-						fixFTP(namesList.get(index));
-					}
-				}
-			}
 		}
 
+		// switches between url and real url
+		// if no fix has been made
 		if (fixed == false) {
 			input = new StringBuffer(XWikiController.getPage(restLink));
 			fixAny(urlsList.get(index));
 			if (fixed == false)
 				fixAny(badLinksList.get(index));
-
-			// try the translation page
-			if (fixed == false) {
-				for (String translation : translations) {
-					if (fixed == false) {
-						translationLink = restLink + "/translations/" + translation;
-						input = new StringBuffer(XWikiController.getPage(translationLink));
-						fixAny(urlsList.get(index));
-						if (fixed == false)
-							fixAny(badLinksList.get(index));
-					}
-				}
-			}
-
 		}
 
 		split = inputFile.split("\\/");
@@ -383,12 +337,6 @@ public class LinkFixer {
 			XWikiController.setPage(restLink, resultFileLocation, username, password);
 		}
 
-	}
-
-	public static void initiateTranslations() {
-		translations = new ArrayList<String>();
-		translations.add("en");
-		translations.add("ru");
 	}
 
 	public static StringBuffer getInput() {
