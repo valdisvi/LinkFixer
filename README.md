@@ -4,7 +4,7 @@ The job is to create a Java application that calls linkcheker (if necessary), an
 # Main features of the project
 1) Web interface for user friendly input setting configuration
 2) Launch LinkCheker to view the broken links
-3) Launch LinkFixer to automatically fix broken links found by LinkCheker
+3) Launch LinkFixer to automatically fix 10 different types of broken links found by LinkCheker
 4) User guide that explains the usage/setup of the project
 
 # Installation (on Linux)
