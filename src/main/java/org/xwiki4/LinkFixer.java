@@ -317,6 +317,7 @@ public class LinkFixer {
 			boolean sanitize) {
 
 		String[] split;
+		String translationLink;
 
 		input = new StringBuffer(XWikiController.getPage(restLink));
 		if (sanitize)
@@ -333,8 +334,8 @@ public class LinkFixer {
 			if (fixed == false) {
 				for (String translation : translations) {
 					if (fixed == false) {
-						restLink = restLink + "/translations/" + translation;
-						input = new StringBuffer(XWikiController.getPage(restLink));
+						translationLink = restLink + "/translations/" + translation;
+						input = new StringBuffer(XWikiController.getPage(translationLink));
 						fixFTP(namesList.get(index));
 					}
 				}
@@ -342,6 +343,7 @@ public class LinkFixer {
 		}
 
 		if (fixed == false) {
+			input = new StringBuffer(XWikiController.getPage(restLink));
 			fixAny(urlsList.get(index));
 			if (fixed == false)
 				fixAny(badLinksList.get(index));
@@ -350,8 +352,8 @@ public class LinkFixer {
 			if (fixed == false) {
 				for (String translation : translations) {
 					if (fixed == false) {
-						restLink = restLink + "/translations/" + translation;
-						input = new StringBuffer(XWikiController.getPage(restLink));
+						translationLink = restLink + "/translations/" + translation;
+						input = new StringBuffer(XWikiController.getPage(translationLink));
 						fixAny(urlsList.get(index));
 						if (fixed == false)
 							fixAny(badLinksList.get(index));
