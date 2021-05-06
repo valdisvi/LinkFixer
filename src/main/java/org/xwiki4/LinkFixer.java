@@ -219,7 +219,7 @@ public class LinkFixer {
 				return;
 
 			File file = new File(inputFile);
-			badLinks.findLinksLocal(file);
+			badLinks.findLinks(file);
 			badLinksList = new ArrayList(badLinks.getParentLinks());
 			locationsList = new ArrayList(badLinks.getRealLinks());
 			urlsList = new ArrayList(badLinks.getUrls());

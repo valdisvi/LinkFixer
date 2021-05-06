@@ -30,7 +30,7 @@ public class BadLinksTest {
 		BadLinks badLinks = new BadLinks();
 		try {
 			File file = new File("src/test/resources/badlinks.html");
-			badLinks.findLinksLocal(file);
+			badLinks.findLinks(file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

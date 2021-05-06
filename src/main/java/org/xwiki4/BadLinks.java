@@ -29,7 +29,7 @@ public class BadLinks {
 		findNames(url);
 	}
 
-	public void findLinksLocal(File url) throws IOException {
+	public void findLinks(File url) throws IOException {
 		Document doc = Jsoup.parse(url, "UTF-8", "");
 		Elements links = doc.select("a:nth-child(1)[target=top][href]");
 		for (Element link : links) {
