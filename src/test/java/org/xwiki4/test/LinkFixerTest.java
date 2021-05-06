@@ -153,6 +153,7 @@ public class LinkFixerTest {
 	// is set up on the local XWiki
 	// don't write to XWiki anything, just check the changed result
 	@Test
+	@Ignore
 	public void testGetFixer() {
 		LinkFixer.setDontChange(true);
 		LinkFixer.getLinkFixer("TestTxt/" + "badlinks.html", "", "");
