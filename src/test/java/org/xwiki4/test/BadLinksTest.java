@@ -20,7 +20,7 @@ public class BadLinksTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Assert.assertEquals(26, badLinks.getErrorCount());
+		Assert.assertEquals(958, badLinks.getErrorCount());
 		Assert.assertEquals(badLinks.getUrls().size(), badLinks.getNames().size());
 		Assert.assertEquals(badLinks.getParentLinks().size(), badLinks.getRealLinks().size());
 	}

@@ -35,7 +35,7 @@ public class SeleniumWebDriverTest {
 	@Test
 	public void linkFixerGUI() {
 
-		driver.get("http://localhost:8080/xwiki/bin/view/LinkFixer/GUI/");
+		driver.get("http://10.0.0.40:8080/xwiki/bin/view/LinkFixer/GUI/");
 	    driver.findElement(By.xpath("//form[@id='selectorForm']/dl/dd/div/div")).click();
 	    {
 	      WebElement element = driver.findElement(By.xpath("//body[@id='body']/div[2]/div/div[2]"));
@@ -74,7 +74,7 @@ public class SeleniumWebDriverTest {
 	    driver.findElement(By.id("numberOfThreads")).sendKeys("5");
 	    driver.findElement(By.id("resultLocation")).sendKeys("/home/student/badlinks.html");
 	    driver.findElement(By.id("domainToFix")).click();
-	    driver.findElement(By.id("domainToFix")).sendKeys("http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/");
+	    driver.findElement(By.id("domainToFix")).sendKeys("http://10.0.0.40:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/");
 	    driver.findElement(By.id("ajaxButton")).click();
 	    driver.findElement(By.id("abortButton")).click();
 	    driver.findElement(By.id("username")).click();

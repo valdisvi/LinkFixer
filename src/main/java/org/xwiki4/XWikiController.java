@@ -18,7 +18,7 @@ import org.xwiki.rest.model.jaxb.Page;
  */
 public class XWikiController {
 
-	public static String defaultPage = "http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/TestPageLinkChecker/spaces/SimplePage/pages/WebHome";
+	public static String defaultPage = "http://10.0.0.40:8080/xwiki/rest/wikis/xwiki/spaces/TestPageLinkChecker/spaces/SimplePage/pages/WebHome";
 
 	// get page using JAXB
 	public static StringBuffer getPage(String url) {
