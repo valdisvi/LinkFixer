@@ -1,4 +1,7 @@
+bin
 .classpath
+.idea/**
+*.iml
 **/.~lock*
 *.log
 logs/**
@@ -7,4 +10,4 @@ logs/**
 .settings/**
 target/**
 wbp-meta/**
-/target/
+**/*.swp
