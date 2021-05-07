@@ -37,7 +37,7 @@ public class Database {
 				preparedStatement.setString(2, language);
 				preparedStatement.setString(3, language);
 			}
-			log.debug(preparedStatement);
+			log.trace(preparedStatement);
 			ResultSet rs = preparedStatement.executeQuery();
 			rs.next();
 			traceValues(rs);
@@ -69,7 +69,7 @@ public class Database {
 				preparedStatement.setString(4, language);
 				preparedStatement.setString(5, language);
 			}
-			log.debug(preparedStatement);
+			log.trace(preparedStatement);
 			preparedStatement.executeUpdate();
 		} catch (Exception e) {
 			log.error(e);

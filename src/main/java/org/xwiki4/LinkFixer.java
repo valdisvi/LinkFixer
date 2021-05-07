@@ -20,9 +20,11 @@ public class LinkFixer {
 	private static final String sourceLog = "logs/source.log";
 	private static final String targetLog = "logs/target.log";
 
-	// fix url
-	// plain implicit url
-	// remove it
+	/**
+	 * fix plain implicit url — remove it
+	 * 
+	 * @param badLink
+	 */
 	public static void fixImplicit(String badLink) {
 		String replacement = " ";
 
@@ -43,18 +45,21 @@ public class LinkFixer {
 		matchAndReplace("((\\h)*([^\\[]){1}(" + correctInput(badLink) + "){1}([^\\]]){1}(\\h)*){1}", replacement);
 	}
 
-	// fix explicit
-	// url, but surrounded by [[]]
-	// remove it
+	/**
+	 * fix explicit url surrounded by [[]] remove it
+	 * 
+	 * @param badLink
+	 */
 	public static void fixExplicit(String badLink) {
 		matchAndReplace("(\\h)*(\\[)\\2{1}(" + correctInput(badLink) + "){1}(\\])\\4{1}(\\h)*", " ");
 	}
 
-	// fix label file
-	// of the form [[label>>link]]
-	// replace with label
-	// also deals with the form [[image:link>>link]]
-	// delete that one
+	/**
+	 * fix label [[label>>link]] — replace with label also deals with the form
+	 * [[image:link>>link]] — delete that one
+	 * 
+	 * @param badLink
+	 */
 	public static void fixLabel(String badLink) {
 		matchAndReplace("((\\h)*(\\[){1}\\3{1}(image:){1}([^\\[]*?)(>>([^\\[]*?)" + correctInput(badLink)
 				+ "){1}(\\]){1}\\8{1}(\\h)*){1}", " ");
@@ -63,17 +68,21 @@ public class LinkFixer {
 				"4");
 	}
 
-	// fix image
-	// of the form [[image:link]]
-	// remove it
+	/**
+	 * fix image [[image:link]] — remove it
+	 * 
+	 * @param badLink
+	 */
 	public static void fixImage(String badLink) {
 		matchAndReplace("((\\h)*(\\[){1}\\3{1}(image:){1}(" + correctInput(badLink) + "){1}(\\]){1}\\6{1}(\\h)*){1}",
 				" ");
 	}
 
-	// fix attach
-	// of the form [[attach:img.png]]
-	// replace it with part before .png
+	/**
+	 * fix attach [[attach:img.png]] replace it with part before .png
+	 * 
+	 * @param badLink
+	 */
 	public static void fixAttach(String badLink) {
 		// match the part before .png
 		Pattern pattern = Pattern.compile("(.*)(\\.)(.*)", Pattern.CASE_INSENSITIVE);
@@ -83,25 +92,31 @@ public class LinkFixer {
 				" " + matcher.group(1) + " ");
 	}
 
-	// fix url
-	// of the form [[url:link]]
-	// delete it
+	/**
+	 * fix url [[url:link]] — delete it
+	 * 
+	 * @param badLink
+	 */
 	public static void fixUrl(String badLink) {
 		matchAndReplace("((\\h)*(\\[){1}\\3{1}(url:){1}(" + correctInput(badLink) + "){1}(\\]){1}\\6{1}(\\h)*){1}",
 				" ");
 	}
 
-	// fix new window
-	// of the form [[link||target="_blank"]]
-	// remove it
+	/**
+	 * fix new window [[link||target="_blank"]] — remove it
+	 * 
+	 * @param badLink
+	 */
 	public static void fixNewWindow(String badLink) {
 		matchAndReplace(
 				"(\\h)*(\\[)\\2{1}([^\\[]*?)(" + correctInput(badLink) + "){1}(||){1}([^\\[]*?)(\\])\\7{1}(\\h)*", " ");
 	}
 
-	// fix ftp
-	// of the form {{some file="location"}}
-	// replace with name
+	/**
+	 * fix ftp {{some file="location"}} — replace with name
+	 * 
+	 * @param badLink
+	 */
 	public static void fixFTP(String badLink) {
 		Pattern pattern = Pattern.compile("(" + correctInput(badLink) + "){1}", Pattern.CASE_INSENSITIVE);
 		try {
@@ -118,9 +133,12 @@ public class LinkFixer {
 		}
 	}
 
-	// decides where the string should go
-	public static void fixAny(String badLink) {
-
+	/**
+	 * decide where the string should go
+	 * 
+	 * @param badLink
+	 */
+	public static boolean fixAny(String badLink) {
 		Pattern pattern = Pattern.compile("(" + correctInput(badLink) + "){1}", Pattern.CASE_INSENSITIVE);
 		try {
 			Matcher matcher = pattern.matcher(content);
@@ -133,17 +151,23 @@ public class LinkFixer {
 				fixUrl(badLink);
 				fixExplicit(badLink);
 				fixImplicit(badLink);
+				// TODO fixFTP(badLink);
+				return true;
 			}
 		} catch (Exception e) {
 			// nothing
 		}
-
+		return false;
 	}
 
-	// does replacements and matching - needs the pattern and the replacement for
-	// the pattern
-	// can pass an int X as a number to specify that X found group is the
-	// replacement
+	/**
+	 * does replacements and matching - needs the pattern and the replacement for
+	 * the pattern can pass an int X as a number to specify that X found group is
+	 * the replacement
+	 * 
+	 * @param stringPattern
+	 * @param replacement
+	 */
 	private static void matchAndReplace(String stringPattern, String replacement) {
 		Pattern pattern = Pattern.compile(stringPattern, Pattern.CASE_INSENSITIVE);
 
@@ -177,7 +201,53 @@ public class LinkFixer {
 		}
 	}
 
-	// escape regex special characters from content string
+	private static void patchResult() {
+		Pattern p;
+		Matcher m;
+		// delete _.
+		p = Pattern.compile(" +\\.");
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll("."));
+		// delete _,
+		p = Pattern.compile(" +,");
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll(","));
+		// delete _)
+		p = Pattern.compile(" +\\)");
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll(")"));
+		// delete (_
+		p = Pattern.compile("\\( +");
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll("("));
+		// delete _]
+		p = Pattern.compile(" +\\]");
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll("]"));
+		// delete [_
+		p = Pattern.compile("\\[ +");
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll("["));
+		// delete ^_
+		p = Pattern.compile("^ +");
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll(""));
+		// delete _$
+		p = Pattern.compile(" +$");
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll("\n"));
+		// delete ^*_
+		p = Pattern.compile("^\\*\\s+?$");
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll(""));
+	}
+
+	/**
+	 * escape regex special characters from content string
+	 * 
+	 * @param input
+	 * @return
+	 */
 	private static String correctInput(String input) {
 		String result = input;
 		String specials = "[^$.|?*+(){}";
@@ -190,67 +260,51 @@ public class LinkFixer {
 	public static void getLinkFixer(String inputFile) {
 		BadLinks badLinks = new BadLinks();
 		List<LinkStruct> linkList;
-		Database database = new Database();
 		writeTo(sourceLog, "");
 		writeTo(targetLog, "");
 		try {
 			// don't do anything if file doesn't exist
-			File f = new File(inputFile);
-			if (!f.exists() || f.isDirectory())
-				return;
-
 			File file = new File(inputFile);
+			if (!file.exists() || file.isDirectory())
+				return;
 			badLinks.findLinks(file);
 			log.trace(badLinks);
 			linkList = badLinks.getLinks();
 			log.debug("XWiki broken links count:" + badLinks.getErrorCount());
-
-			// do the actual fixing
-			String prevParent = null;
-			for (LinkStruct clink : linkList) {
-				if (prevParent == null) {
-					prevParent = clink.parentLink;
-					continue;
-				}
-				if (clink.parentLink.equals(prevParent)) {
-					// Update changes
-					processData(clink, database);
-				} else {
-					prevParent = clink.parentLink;
-					// COMMIT changes
-				}
-
-			}
-
+			processData(linkList);
 			log.info("Done fixing!");
-
 		} catch (IOException e) {
 			log.error("LinkFixer exception!" + e);
 		}
 
 	}
 
-	// a combination of reading/link fixing/writing
-	public static StringBuilder processData(LinkStruct links, Database database) {
+	/**
+	 * Get language of the document from link
+	 * 
+	 * @param link
+	 * @return
+	 */
+	static String getLanguage(String link) {
 		String language = "";
-		boolean fixed = false;
-		boolean comment = false;
-		if (links.parentLink.contains("?language=")) {
+		if (link.contains("?language=")) {
 			try {
-				language = links.parentLink.split("\\?language=")[1];
+				language = link.split("\\?language=")[1];
 			} catch (Exception e) {
-				log.error("Couldn't get language for link:" + links.parentLink);
+				log.error("Couldn't get language for link:" + link);
 			}
 		}
-		if (links.parentLink.contains("#Comments"))
-			comment = true;
-		String info = "";
-		if (!"".equals(language))
-			info = " lang:" + language;
-		if (comment)
-			info = info + ", comment";
-		// Get document name
-		String[] parts = links.parentLink.split("(/|\\?|#)");
+		return language;
+	}
+
+	/**
+	 * Get full document name from link
+	 * 
+	 * @param link
+	 * @return
+	 */
+	static String getFullName(String link) {
+		String[] parts = link.split("(/|\\?|#)");
 		String fullName = null;
 		for (int i = 1; i < parts.length; i++) {
 			if (!parts[i].contains("=")) {
@@ -259,64 +313,64 @@ public class LinkFixer {
 		}
 		// Fix pages with hidden Main space
 		fullName = fullName.replace(pagePrefix, "Main");
+		return fullName;
+	}
 
-		log.debug(fullName + " : " + links.parentLink + info + " : " + links.realLink);
-		content = new StringBuilder(database.getDocument(fullName, language));
-		appendTo(sourceLog, fullName + "--------------------");
-		appendTo(targetLog, fullName + "--------------------");
-		appendTo(sourceLog, content.toString());
-
-		fixAny(links.url);
-		fixAny(links.realLink);
-		if (links.realLink.contains("ftp") || links.realLink.contains(".")) {
-			fixFTP(links.realLink);
-		}
-		appendTo(targetLog, content.toString());
-		appendTo(targetLog, "--------------------");
-		appendTo(sourceLog, "--------------------");
-		return null;
-		/*-
-		//StringBuffer content = new StringBuffer(XWikiController.getPage(restLink));
-		
-		fixed = false;
-		
-		// switches between url and real url
-		// if no fix has been made
-		if (fixed == false) {
-			// TODO content = new StringBuffer(XWikiController.getPage(restLink));
-			fixAny(urlsList.get(index));
-			if (fixed == false)
-				fixAny(badLinksList.get(index));
-		}
-		
-		if (fixed == false) {
-			if (badLinksList.get(index).contains("ftp") || badLinksList.get(index).contains(".")) {
-				fixFTP(namesList.get(index));
+	/**
+	 * combination of reading/link fixing/writing
+	 * 
+	 * @param linkList
+	 */
+	public static void processData(List<LinkStruct> linkList) {
+		Database database = new Database();
+		String language = "";
+		String fullName = null;
+		String prevName = null;
+		int i = 0;
+		for (LinkStruct clink : linkList) {
+			fullName = getFullName(clink.parentLink);
+			language = getLanguage(clink.parentLink);
+			if (prevName == null) {
+				prevName = fullName;
+				content = new StringBuilder(database.getDocument(fullName, language)); // get content for first entry
+				appendTo(sourceLog, "\n" + fullName + "--------------------\n");
+				appendTo(sourceLog, content.toString());
+				continue;
 			}
-		}
-		
-		split = inputFile.split("\\/");
-		
-		resultFileLocation = "/";
-		
-		for (int k = 0; k < split.length; k++) {
-			if (!split[k].isEmpty() && k != split.length - 1) {
-				resultFileLocation = resultFileLocation.concat(split[k] + "/");
+			if (fullName == null) {
+				log.error("Couldn't get fullName for: " + clink.parentLink);
+				continue;
 			}
+			if (clink.parentLink.contains("#Comments")) {// don't deal with comments
+				log.warn("Skipped fixing for: " + clink.parentLink);
+				continue;
+			}
+			// continue with current document
+			if (fullName.equals(prevName)) {
+				log.debug(fullName + ": " + i + ": " + clink.realLink);
+				if (!fixAny(clink.url))
+					fixAny(clink.realLink);
+				/*- TODO
+				if (clink.realLink.contains("ftp") || clink.realLink.contains(".")) {
+					fixFTP(clink.realLink);
+				}
+				*/
+				patchResult();
+				i++;
+			} else { // Finish previous and start new document
+				i = 0;
+				log.debug("New: " + fullName + ":" + language);
+				appendTo(targetLog, "\n" + prevName + "--------------------\n");
+				appendTo(targetLog, content.toString()); // modified content
+				content = new StringBuilder(database.getDocument(fullName, language)); // get new content
+				appendTo(sourceLog, "\n" + fullName + "--------------------\n");
+				appendTo(sourceLog, content.toString());
+			}
+			prevName = fullName;
 		}
-		
-		resultFileLocation = resultFileLocation.concat("fixResult.txt");
-		
-		// don't write if empty
-		if (content.length() > 0 && fixed == true && dontChange == false) {
-			// write the changes to text file
-			// TODO TestUtility.writeTo(content, resultFileLocation);
-			// push the changes to XWiki
-			// TODO XWikiController.setPage(restLink, resultFileLocation, username,
-			// password);
-		}
-		*/
-
+		// Deal with last entry
+		appendTo(targetLog, "\n" + prevName + "--------------------\n");
+		appendTo(targetLog, content.toString()); // modified content
 	}
 
 	public static StringBuilder getInput() {
@@ -327,11 +381,22 @@ public class LinkFixer {
 		content = inputIn;
 	}
 
-	// write to file
+	/**
+	 * write to file
+	 * 
+	 * @param name
+	 * @param result
+	 */
 	public static void writeTo(String name, StringBuilder result) {
 		writeTo(name, result.toString());
 	}
 
+	/**
+	 * write to file
+	 * 
+	 * @param name
+	 * @param result
+	 */
 	public static void writeTo(String name, String result) {
 		File file = new File(name);
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -342,7 +407,12 @@ public class LinkFixer {
 		}
 	}
 
-	// append to file
+	/**
+	 * append to file
+	 * 
+	 * @param name
+	 * @param content
+	 */
 	public static void appendTo(String name, String content) {
 		File file = new File(name);
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
@@ -353,7 +423,12 @@ public class LinkFixer {
 		}
 	}
 
-	// read from file
+	/**
+	 * read from file
+	 * 
+	 * @param name
+	 * @return
+	 */
 	public static StringBuilder readFrom(String name) {
 		StringBuilder result = new StringBuilder();
 		int c = 0;
