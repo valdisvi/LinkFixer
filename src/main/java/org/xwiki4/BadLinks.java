@@ -21,9 +21,9 @@ public class BadLinks {
 		Elements links = doc.select("a:nth-child(1)[target=top][href]");
 		for (Element link : links) {
 			if (links.indexOf(link) % 2 != 0)
-				parentLinks.add(link.attr("abs:href"));
-			else
 				realLinks.add(link.attr("abs:href"));
+			else
+				parentLinks.add(link.attr("abs:href"));
 		}
 		findUrls(url);
 		findNames(url);
@@ -34,9 +34,9 @@ public class BadLinks {
 		Elements links = doc.select("a:nth-child(1)[target=top][href]");
 		for (Element link : links) {
 			if (links.indexOf(link) % 2 != 0)
-				parentLinks.add(link.attr("abs:href"));
-			else
 				realLinks.add(link.attr("abs:href"));
+			else
+				parentLinks.add(link.attr("abs:href"));
 		}
 		findUrlsLocal(url);
 		findNamesLocal(url);
@@ -75,7 +75,7 @@ public class BadLinks {
 	}
 
 	public int getErrorCount() {
-		return parentLinks.size();
+		return realLinks.size();
 	}
 
 	public ArrayList<String> getParentLinks() {
