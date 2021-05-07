@@ -1,12 +1,17 @@
 package org.xwiki4.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.xwiki4.LinkFixer.readFrom;
+import static org.xwiki4.LinkFixer.writeTo;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki4.LinkFixer;
 
-/*
- * @author Edmunds Ozolins
- */
 public class LinkFixerLargeTest {
 
 	public static final String noMatch = " does not match expected";
@@ -15,7 +20,7 @@ public class LinkFixerLargeTest {
 
 	@Before
 	public void setUp() {
-		LinkFixer.setInput(TestUtility.readFrom("TestTxt/BibleTest.txt"));
+		LinkFixer.setInput(readFrom("TestTxt/BibleTest.txt"));
 	}
 
 	// large test
@@ -33,7 +38,18 @@ public class LinkFixerLargeTest {
 		LinkFixer.fixExplicit(defaultLink);
 		LinkFixer.fixImplicit(defaultLink);
 		LinkFixer.fixImage(defaultLink);
-		TestUtility.assertFiles(name, "Bible", noMatch);
+		assertFiles(name, "Bible", noMatch);
+	}
+
+	public static void assertFiles(String name, String user, String message) {
+		writeTo(LinkFixer.getInput(), "TestTxt/" + name);
+		try {
+			assertEquals(user + message,
+					FileUtils.readFileToString(new File("TestTxt/Correct" + user + ".txt"), StandardCharsets.UTF_8),
+					FileUtils.readFileToString(new File("TestTxt/" + name), StandardCharsets.UTF_8));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

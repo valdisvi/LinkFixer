@@ -1,18 +1,17 @@
 package org.xwiki4;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-/*
- * @author Edmunds Ozolins
- * Uses regex to fix links, which are passed as an html file
- */
 
 public class LinkFixer {
 
@@ -164,7 +163,8 @@ public class LinkFixer {
 			// if replacement is actually int replace with group
 			try {
 				Integer.parseInt(replacement);
-				content = new StringBuilder(matcher.replaceAll(" " + matcher.group(Integer.parseInt(replacement)) + " "));
+				content = new StringBuilder(
+						matcher.replaceAll(" " + matcher.group(Integer.parseInt(replacement)) + " "));
 				log.info("Fixed!");
 			} catch (NumberFormatException e) {
 				// not a number just replace
@@ -255,7 +255,7 @@ public class LinkFixer {
 		}
 		// Fix pages with hidden space
 		fullName = fullName.replace(pagePrefix, "Main");
-		
+
 		log.debug(fullName + " : " + links.parentLink + info + " : " + links.realLink);
 		content = new StringBuilder(database.getDocument(fullName, language));
 
@@ -310,5 +310,30 @@ public class LinkFixer {
 
 	public static void setInput(StringBuilder inputIn) {
 		content = inputIn;
+	}
+
+	// a write to file
+	public static void writeTo(StringBuilder result, String name) {
+		File file = new File(name);
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+			writer.write(result.toString());
+			writer.flush();
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+
+	// read from file
+	public static StringBuilder readFrom(String name) {
+		StringBuilder result = new StringBuilder();
+		int c = 0;
+		try (BufferedReader reader = new BufferedReader(new FileReader(new File(name)))) {
+			while ((c = reader.read()) != -1) {
+				result.append((char) c);
+			}
+		} catch (IOException e) {
+			log.error(e);
+		}
+		return result;
 	}
 }

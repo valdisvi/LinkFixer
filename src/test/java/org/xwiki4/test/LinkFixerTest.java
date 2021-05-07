@@ -1,13 +1,14 @@
 package org.xwiki4.test;
 
+import static org.xwiki4.LinkFixer.readFrom;
+import static org.xwiki4.LinkFixer.writeTo;
+import static org.xwiki4.test.LinkFixerLargeTest.assertFiles;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xwiki4.LinkFixer;
 
-/*
- * @author Edmunds Ozolins
- */
 
 public class LinkFixerTest {
 
@@ -17,7 +18,7 @@ public class LinkFixerTest {
 
 	@Before
 	public void setUp() {
-		LinkFixer.setInput(TestUtility.readFrom("TestTxt/Test1.txt"));
+		LinkFixer.setInput(readFrom("TestTxt/Test1.txt"));
 	}
 
 	@Test
@@ -26,11 +27,11 @@ public class LinkFixerTest {
 
 		// fix needed
 		LinkFixer.fixImplicit("https://www.xwiki.org");
-		TestUtility.assertFiles(name, "Implicit", noMatch);
+		assertFiles(name, "Implicit", noMatch);
 
 		// fix not needed
 		LinkFixer.fixImplicit(defaultLink);
-		TestUtility.assertFiles(name, "Implicit", noChange);
+		assertFiles(name, "Implicit", noChange);
 	}
 
 	@Test
@@ -38,11 +39,11 @@ public class LinkFixerTest {
 		String name = "explicit.txt";
 		// fix needed
 		LinkFixer.fixExplicit("https://www.google.com/");
-		TestUtility.assertFiles(name, "Explicit", noMatch);
+		assertFiles(name, "Explicit", noMatch);
 
 		// fix not needed
 		LinkFixer.fixExplicit(defaultLink);
-		TestUtility.assertFiles(name, "Explicit", noChange);
+		assertFiles(name, "Explicit", noChange);
 	}
 
 	@Test
@@ -50,11 +51,11 @@ public class LinkFixerTest {
 		String name = "label.txt";
 		// fix needed
 		LinkFixer.fixLabel(defaultLink);
-		TestUtility.assertFiles(name, "Label", noMatch);
+		assertFiles(name, "Label", noMatch);
 
 		// fix not needed
 		LinkFixer.fixLabel("https://www.xwiki.org");
-		TestUtility.assertFiles(name, "Label", noChange);
+		assertFiles(name, "Label", noChange);
 	}
 
 	// should be fixed by label fixer
@@ -63,11 +64,11 @@ public class LinkFixerTest {
 		String name = "email.txt";
 		// fix needed
 		LinkFixer.fixLabel("mailto:someone@somewhere.com");
-		TestUtility.assertFiles(name, "Email", noMatch);
+		assertFiles(name, "Email", noMatch);
 
 		// fix not needed
 		LinkFixer.fixLabel("mailto:noone@nowhere.com");
-		TestUtility.assertFiles(name, "Email", noChange);
+		assertFiles(name, "Email", noChange);
 	}
 
 	@Test
@@ -75,11 +76,11 @@ public class LinkFixerTest {
 		String name = "image.txt";
 		// fix needed
 		LinkFixer.fixImage("https://www.w3schools.com/js/tryit.asp?filename=tryjs_randomlink");
-		TestUtility.assertFiles(name, "Image", noMatch);
+		assertFiles(name, "Image", noMatch);
 
 		// fix not needed
 		LinkFixer.fixImage(defaultLink);
-		TestUtility.assertFiles(name, "Image", noChange);
+		assertFiles(name, "Image", noChange);
 	}
 
 	@Test
@@ -88,11 +89,11 @@ public class LinkFixerTest {
 
 		// fix needed
 		LinkFixer.fixLabel("https://odo.lv/Blog/?language=en");
-		TestUtility.assertFiles(name, "LinkImage", noMatch);
+		assertFiles(name, "LinkImage", noMatch);
 
 		// fix not needed
 		LinkFixer.fixLabel("https://www.w3schools.com/js/tryit.asp?filename=tryjs_randomlink");
-		TestUtility.assertFiles(name, "LinkImage", noChange);
+		assertFiles(name, "LinkImage", noChange);
 	}
 
 	@Test
@@ -101,11 +102,11 @@ public class LinkFixerTest {
 
 		// fix needed
 		LinkFixer.fixAttach("cat.jpg");
-		TestUtility.assertFiles(name, "Attach", noMatch);
+		assertFiles(name, "Attach", noMatch);
 
 		// fix not needed
 		LinkFixer.fixAttach(defaultLink);
-		TestUtility.assertFiles(name, "Attach", noChange);
+		assertFiles(name, "Attach", noChange);
 	}
 
 	@Test
@@ -114,11 +115,11 @@ public class LinkFixerTest {
 
 		// fix needed
 		LinkFixer.fixNewWindow("https://www.cnet.com/how-to/nine-tools-that-let-you-randomly-browse-the-web/");
-		TestUtility.assertFiles(name, "New", noMatch);
+		assertFiles(name, "New", noMatch);
 
 		// fix not needed
 		LinkFixer.fixNewWindow("https://www.xwiki.org");
-		TestUtility.assertFiles(name, "New", noChange);
+		assertFiles(name, "New", noChange);
 	}
 
 	@Test
@@ -127,11 +128,11 @@ public class LinkFixerTest {
 
 		// fix needed
 		LinkFixer.fixUrl("http://www.badlink.org");
-		TestUtility.assertFiles(name, "URL", noMatch);
+		assertFiles(name, "URL", noMatch);
 
 		// fix not needed
 		LinkFixer.fixUrl(defaultLink);
-		TestUtility.assertFiles(name, "URL", noChange);
+		assertFiles(name, "URL", noChange);
 	}
 
 	@Test
@@ -140,11 +141,11 @@ public class LinkFixerTest {
 
 		// fix needed
 		LinkFixer.fixFTP("mystuff.zip");
-		TestUtility.assertFiles(name, "FTP", noMatch);
+		assertFiles(name, "FTP", noMatch);
 
 		// fix not needed
 		LinkFixer.fixFTP("http://www.badlink.org");
-		TestUtility.assertFiles(name, "FTP", noChange);
+		assertFiles(name, "FTP", noChange);
 
 	}
 
@@ -155,8 +156,8 @@ public class LinkFixerTest {
 	@Ignore
 	public void testGetFixer() {
 		LinkFixer.getLinkFixer("TestTxt/" + "badlinks.html");
-		TestUtility.writeTo(LinkFixer.getInput(), "TestTxt/" + "getFixerResult.txt");
-		TestUtility.assertFiles("getFixerResult.txt", "GetFixer",
+		writeTo(LinkFixer.getInput(), "TestTxt/" + "getFixerResult.txt");
+		assertFiles("getFixerResult.txt", "GetFixer",
 				"GetFixer test failed, check that Main.GetFixer.WebHome.xar is set up on the local XWiki");
 	}
 
