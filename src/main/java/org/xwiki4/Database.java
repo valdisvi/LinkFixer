@@ -5,8 +5,8 @@ import java.sql.*;
 import org.apache.log4j.Logger;
 
 public class Database {
-	Connection con = null;
-	Logger log;
+	private Connection con = null;
+	private Logger log;
 
 	public Database() {
 		try {
@@ -21,31 +21,63 @@ public class Database {
 		}
 	}
 
-	public String getDocument(String fullname, String language) {
+	public String getDocumentValue(String fullname, String language, String fieldName) {
+		String sql = "";
+		if (language == null || "".equals(language))
+			sql = "select * from xwiki.xwikidoc where XWD_FULLNAME = ? and XWD_TRANSLATION = 0";
+		else
+			sql = "SELECT * FROM xwiki.xwikidoc where XWD_FULLNAME = ? and (XWD_LANGUAGE=? or (XWD_DEFAULT_LANGUAGE = ? and XWD_TRANSLATION = 0));";
+		if (fieldName == null || "".equals(fieldName))
+			fieldName = "XWD_CONTENT";
 		try {
-			String sql = "";
-			if (language == null || "".equals(language))
-				sql = "select XWD_CONTENT from xwikidoc where XWD_FULLNAME=?";
-			else
-				sql = "SELECT * FROM xwiki.xwikidoc where XWD_FULLNAME = ? and (XWD_LANGUAGE=? or (XWD_DEFAULT_LANGUAGE=? and XWD_TRANSLATION=0));";
+
 			PreparedStatement preparedStatement = con.prepareStatement(sql);
 			preparedStatement.setString(1, fullname);
 			if (language != null && !"".equals(language)) {
 				preparedStatement.setString(2, language);
 				preparedStatement.setString(3, language);
 			}
+			log.debug(preparedStatement);
 			ResultSet rs = preparedStatement.executeQuery();
-
 			rs.next();
-			logValues(rs);
-
-			return rs.getString("XWD_CONTENT");
-
+			traceValues(rs);
+			return rs.getString(fieldName);
 		} catch (Exception e) {
 			log.error(e);
 		}
 		return "";
+	}
 
+	public String getDocument(String fullname, String language) {
+		return getDocumentValue(fullname, language, "XWD_CONTENT");
+	}
+
+	public void putDocument(String fullName, String language, String value, String fieldName) {
+		if (fieldName == null || "".equals(fieldName))
+			fieldName = "XWD_CONTENT";
+		String sql = "";
+		if (language == null || "".equals(language))
+			sql = "update xwiki.xwikidoc set ?? = ? where XWD_FULLNAME = ? and XWD_TRANSLATION = 0";
+		else
+			sql = "update xwiki.xwikidoc set ?? = ? where XWD_FULLNAME = ? and (XWD_LANGUAGE = ? or (XWD_DEFAULT_LANGUAGE = ? and XWD_TRANSLATION = 0));";
+		try {
+			PreparedStatement preparedStatement = con.prepareStatement(sql);
+			preparedStatement.setString(1, fieldName);
+			preparedStatement.setString(2, value);
+			preparedStatement.setString(3, fullName);
+			if (language != null && !"".equals(language)) {
+				preparedStatement.setString(4, language);
+				preparedStatement.setString(5, language);
+			}
+			log.debug(preparedStatement);
+			preparedStatement.executeUpdate();
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+
+	public void putDocument(String fullName, String language, String value) {
+		putDocument(fullName, language, value, "XWD_CONTENT");
 	}
 
 	public void closeConnection() {
@@ -57,7 +89,7 @@ public class Database {
 
 	}
 
-	public void logValues(ResultSet rs) {
+	public void traceValues(ResultSet rs) {
 		StringBuilder sb = new StringBuilder();
 		try {
 			ResultSetMetaData rsmd = rs.getMetaData();
@@ -67,7 +99,7 @@ public class Database {
 				sb.append(rsmd.getColumnName(i) + ": '" + rs.getString(i) + "'\n");
 			}
 			sb.append("----------");
-			log.debug(sb.toString());
+			log.trace(sb.toString());
 		} catch (Exception e) {
 			log.error(e);
 		}

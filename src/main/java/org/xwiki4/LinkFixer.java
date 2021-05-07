@@ -2,6 +2,7 @@ package org.xwiki4;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,7 +17,8 @@ import org.apache.log4j.Logger;
 public class LinkFixer {
 
 	private static Logger log = Logger.getLogger(LinkFixer.class);
-	private static StringBuilder input;
+	private static StringBuilder content;
+	private static final String pagePrefix = "odo.lv";
 
 	// fix url
 	// plain implicit url
@@ -28,7 +30,7 @@ public class LinkFixer {
 			Pattern pattern = Pattern.compile(
 					"((\\h)*([^\\[]){1}(" + correctInput(badLink) + "){1}([^\\]]){1}(\\h)*){1}",
 					Pattern.CASE_INSENSITIVE);
-			Matcher matcher = pattern.matcher(input);
+			Matcher matcher = pattern.matcher(content);
 			matcher.find();
 			if (matcher.group(3).equals("\n") || matcher.group(5).equals("\n") || matcher.group(3).equals("\r")
 					|| matcher.group(5).equals("\r")) {
@@ -103,7 +105,7 @@ public class LinkFixer {
 	public static void fixFTP(String badLink) {
 		Pattern pattern = Pattern.compile("(" + correctInput(badLink) + "){1}", Pattern.CASE_INSENSITIVE);
 		try {
-			Matcher matcher = pattern.matcher(input);
+			Matcher matcher = pattern.matcher(content);
 			if (matcher.find()) {
 				log.debug("Found:" + badLink);
 				String[] split;
@@ -121,7 +123,7 @@ public class LinkFixer {
 
 		Pattern pattern = Pattern.compile("(" + correctInput(badLink) + "){1}", Pattern.CASE_INSENSITIVE);
 		try {
-			Matcher matcher = pattern.matcher(input);
+			Matcher matcher = pattern.matcher(content);
 			if (matcher.find()) {
 				log.debug("Found:" + badLink);
 				fixLabel(badLink);
@@ -146,7 +148,7 @@ public class LinkFixer {
 		Pattern pattern = Pattern.compile(stringPattern, Pattern.CASE_INSENSITIVE);
 
 		try {
-			Matcher matcher = pattern.matcher(input);
+			Matcher matcher = pattern.matcher(content);
 			matcher.find();
 
 			// restore newlines
@@ -162,11 +164,11 @@ public class LinkFixer {
 			// if replacement is actually int replace with group
 			try {
 				Integer.parseInt(replacement);
-				input = new StringBuilder(matcher.replaceAll(" " + matcher.group(Integer.parseInt(replacement)) + " "));
+				content = new StringBuilder(matcher.replaceAll(" " + matcher.group(Integer.parseInt(replacement)) + " "));
 				log.info("Fixed!");
 			} catch (NumberFormatException e) {
 				// not a number just replace
-				input = new StringBuilder(matcher.replaceAll(replacement));
+				content = new StringBuilder(matcher.replaceAll(replacement));
 				log.info("Fixed!");
 			}
 		} catch (IllegalStateException e) {
@@ -174,7 +176,7 @@ public class LinkFixer {
 		}
 	}
 
-	// escape regex special characters from input string
+	// escape regex special characters from content string
 	private static String correctInput(String input) {
 		String result = input;
 		String specials = "[^$.|?*+(){}";
@@ -187,6 +189,7 @@ public class LinkFixer {
 	public static void getLinkFixer(String inputFile) {
 		BadLinks badLinks = new BadLinks();
 		List<LinkStruct> linkList;
+		Database database = new Database();
 		try {
 			// don't do anything if file doesn't exist
 			File f = new File(inputFile);
@@ -208,7 +211,7 @@ public class LinkFixer {
 				}
 				if (clink.parentLink.equals(prevParent)) {
 					// Update changes
-					processData(clink);
+					processData(clink, database);
 				} else {
 					prevParent = clink.parentLink;
 					// COMMIT changes
@@ -225,36 +228,48 @@ public class LinkFixer {
 	}
 
 	// a combination of reading/link fixing/writing
-	public static void processData(LinkStruct links) {
-
+	public static StringBuilder processData(LinkStruct links, Database database) {
 		String language = "";
 		boolean comment = false;
-		if (links.parentLink.contains("?language="))
+		if (links.parentLink.contains("?language=")) {
 			try {
 				language = links.parentLink.split("\\?language=")[1];
 			} catch (Exception e) {
 				log.error("Couldn't get language for link:" + links.parentLink);
 			}
+		}
 		if (links.parentLink.contains("#Comments"))
 			comment = true;
-
 		String info = "";
 		if (!"".equals(language))
 			info = " lang:" + language;
 		if (comment)
 			info = info + ", comment";
+		// Get document name
+		String[] parts = links.parentLink.split("(/|\\?|#)");
+		String fullName = null;
+		for (int i = 1; i < parts.length; i++) {
+			if (!parts[i].contains("=")) {
+				fullName = parts[i - 1] + "." + parts[i];
+			}
+		}
+		// Fix pages with hidden space
+		fullName = fullName.replace(pagePrefix, "Main");
+		System.err.println(fullName);
+		log.debug(fullName + " : " + links.parentLink + info + " : " + links.realLink);
 
-		log.debug(links.parentLink + info + " :" + links.realLink);
+		content = new StringBuilder(database.getDocument(fullName, language));
 
+		return null;
 		/*-
-		//StringBuffer input = new StringBuffer(XWikiController.getPage(restLink));
+		//StringBuffer content = new StringBuffer(XWikiController.getPage(restLink));
 		
 		fixed = false;
 		
 		// switches between url and real url
 		// if no fix has been made
 		if (fixed == false) {
-			// TODO input = new StringBuffer(XWikiController.getPage(restLink));
+			// TODO content = new StringBuffer(XWikiController.getPage(restLink));
 			fixAny(urlsList.get(index));
 			if (fixed == false)
 				fixAny(badLinksList.get(index));
@@ -279,9 +294,9 @@ public class LinkFixer {
 		resultFileLocation = resultFileLocation.concat("fixResult.txt");
 		
 		// don't write if empty
-		if (input.length() > 0 && fixed == true && dontChange == false) {
+		if (content.length() > 0 && fixed == true && dontChange == false) {
 			// write the changes to text file
-			// TODO TestUtility.writeTo(input, resultFileLocation);
+			// TODO TestUtility.writeTo(content, resultFileLocation);
 			// push the changes to XWiki
 			// TODO XWikiController.setPage(restLink, resultFileLocation, username,
 			// password);
@@ -291,11 +306,17 @@ public class LinkFixer {
 	}
 
 	public static StringBuilder getInput() {
-		return input;
+		return content;
 	}
 
 	public static void setInput(StringBuilder inputIn) {
-		input = inputIn;
+		content = inputIn;
+	}
+
+	public static void main(String[] args) {
+		String url = "http://localhost:8080/TestPageLinkChecker/SimplePage?aa=aa&bb=bb#cc";
+		String[] parts = url.split("(/|\\?|#)");
+		System.err.println(Arrays.toString(parts));
 	}
 
 }
