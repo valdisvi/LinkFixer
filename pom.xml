@@ -5,77 +5,42 @@
 	<groupId>XWiki</groupId>
 	<artifactId>XWiki</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<!-- https://mvnrepository.com/artifact/commons-httpclient/commons-httpclient -->
-	<repositories>
-		<repository>
-			<id>maven.xwiki.org</id>
-			<url>https://maven.xwiki.org/releases/</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
-
-		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1</version>
-		</dependency>
-
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
 			<version>2.2.11</version>
 		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.xwiki.platform/xwiki-rest-model -->
-		<dependency>
-			<groupId>org.xwiki.platform</groupId>
-			<artifactId>xwiki-rest-model</artifactId>
-			<version>3.0-milestone-2</version>
-		</dependency>
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.6</version>
 		</dependency>
-
 		<!-- jsoup HTML parser library @ https://jsoup.org/ -->
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 			<version>1.12.1</version>
 		</dependency>
-
-		<!-- Selenium -->
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
-			<version>3.4.0</version>
-		</dependency>
-
 		<!-- MySQL -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>8.0.20</version>
 		</dependency>
-
 		<!-- Logger -->
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
 		</dependency>
-
 	</dependencies>
 	<build>
 		<plugins>
