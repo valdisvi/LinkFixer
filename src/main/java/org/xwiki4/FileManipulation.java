@@ -91,14 +91,6 @@ public class FileManipulation {
 		return result;
 	}
 
-	// check if exists
-	public static boolean fileExists(String name) {
-		File f = new File(name);
-		if (f.exists() && !f.isDirectory()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+	
 
 }

@@ -213,7 +213,8 @@ public class LinkFixer {
 		File resultFile;
 		try {
 			// don't do anything if file doesn't exist
-			if (FileManipulation.fileExists(inputFile) == false)
+			File f = new File(inputFile);
+			if (!f.exists() || f.isDirectory())
 				return;
 
 			File file = new File(inputFile);
