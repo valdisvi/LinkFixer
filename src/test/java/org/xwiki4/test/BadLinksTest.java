@@ -1,5 +1,7 @@
 package org.xwiki4.test;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -20,9 +22,9 @@ public class BadLinksTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Assert.assertEquals(958, badLinks.getErrorCount());
-		Assert.assertEquals(badLinks.getUrls().size(), badLinks.getNames().size());
-		Assert.assertEquals(badLinks.getParentLinks().size(), badLinks.getRealLinks().size());
+		assertEquals(958, badLinks.getErrorCount());
+		assertEquals(badLinks.getUrls().size(), badLinks.getNames().size());
+		assertEquals(badLinks.getParentLinks().size(), badLinks.getRealLinks().size());
 	}
 
 	@Test
@@ -31,13 +33,36 @@ public class BadLinksTest {
 		try {
 			File file = new File("src/test/resources/badlinks.html");
 			badLinks.findLinks(file);
+			System.out.println(badLinks);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Assert.assertEquals(18, badLinks.getErrorCount());
-		Assert.assertEquals(badLinks.getUrls().size(), badLinks.getErrorCount());
-		Assert.assertEquals(badLinks.getUrls().size(), badLinks.getNames().size());
-		Assert.assertEquals(badLinks.getParentLinks().size(), badLinks.getRealLinks().size());
+		assertEquals(18, badLinks.getErrorCount());
+		assertEquals(badLinks.getUrls().size(), badLinks.getErrorCount());
+		assertEquals(badLinks.getUrls().size(), badLinks.getNames().size());
+		assertEquals(badLinks.getParentLinks().size(), badLinks.getRealLinks().size());
+
+		String badLinksString = "" //
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ https://www.vardene.lv/index.php/Lokaliz%C4%93%C5%A1anas_rokasgr%C4%81mata/ https://www.vardene.lv/index.php/Lokaliz%c4%93%c5%a1anas_rokasgr%c4%81mata/ https://www.vardene.lv/index.php/Lokaliz%c4%93%c5%a1anas_rokasgr%c4%81mata/\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ https://svn.xwiki.org/ https://svn.xwiki.org/ https://svn.xwiki.org/\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ label\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ label\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ bold label\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ https://precinso.ga https://precinso.ga https://precinso.ga\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ https://precinso.ga/ https://precinso.ga/ https://precinso.ga/\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ https://www.xwiki.org/xwiki/webjars/wiki%3Axwiki/xwiki-platform-tree-webjar/8.4.4/throbber https://www.xwiki.org/xwiki/webjars/wiki%3Axwiki/xwiki-platform-tree-webjar/8.4.4/throbber https://www.xwiki.org/xwiki/webjars/wiki%3Axwiki/xwiki-platform-tree-webjar/8.4.4/throbber\n"
+				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ https://www.bpmi.org/bpml-spec.htm https://www.bpmi.org/bpml-spec.htm https://www.bpmi.org/bpml-spec.htm\n";
+		assertEquals(badLinksString, badLinks.toString());
+
 	}
 
 }
