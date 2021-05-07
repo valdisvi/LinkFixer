@@ -3,7 +3,7 @@ package org.xwiki4.test;
 import org.junit.Test;
 import org.xwiki4.LinkFixer;
 
-public class MyTest {
+public class IntegrationTest {
 
 	@Test
 	public void testGetFixer() {
