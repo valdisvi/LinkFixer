@@ -42,7 +42,7 @@ public class LinkFixerLargeTest {
 	}
 
 	public static void assertFiles(String name, String user, String message) {
-		writeTo(LinkFixer.getInput(), "TestTxt/" + name);
+		writeTo("TestTxt/" + name, LinkFixer.getInput());
 		try {
 			assertEquals(user + message,
 					FileUtils.readFileToString(new File("TestTxt/Correct" + user + ".txt"), StandardCharsets.UTF_8),

@@ -12,12 +12,13 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-
 public class LinkFixer {
 
 	private static Logger log = Logger.getLogger(LinkFixer.class);
 	private static StringBuilder content;
 	private static final String pagePrefix = "odo.lv";
+	private static final String sourceLog = "logs/source.log";
+	private static final String targetLog = "logs/target.log";
 
 	// fix url
 	// plain implicit url
@@ -190,6 +191,8 @@ public class LinkFixer {
 		BadLinks badLinks = new BadLinks();
 		List<LinkStruct> linkList;
 		Database database = new Database();
+		writeTo(sourceLog, "");
+		writeTo(targetLog, "");
 		try {
 			// don't do anything if file doesn't exist
 			File f = new File(inputFile);
@@ -230,6 +233,7 @@ public class LinkFixer {
 	// a combination of reading/link fixing/writing
 	public static StringBuilder processData(LinkStruct links, Database database) {
 		String language = "";
+		boolean fixed = false;
 		boolean comment = false;
 		if (links.parentLink.contains("?language=")) {
 			try {
@@ -253,12 +257,23 @@ public class LinkFixer {
 				fullName = parts[i - 1] + "." + parts[i];
 			}
 		}
-		// Fix pages with hidden space
+		// Fix pages with hidden Main space
 		fullName = fullName.replace(pagePrefix, "Main");
 
 		log.debug(fullName + " : " + links.parentLink + info + " : " + links.realLink);
 		content = new StringBuilder(database.getDocument(fullName, language));
+		appendTo(sourceLog, fullName + "--------------------");
+		appendTo(targetLog, fullName + "--------------------");
+		appendTo(sourceLog, content.toString());
 
+		fixAny(links.url);
+		fixAny(links.realLink);
+		if (links.realLink.contains("ftp") || links.realLink.contains(".")) {
+			fixFTP(links.realLink);
+		}
+		appendTo(targetLog, content.toString());
+		appendTo(targetLog, "--------------------");
+		appendTo(sourceLog, "--------------------");
 		return null;
 		/*-
 		//StringBuffer content = new StringBuffer(XWikiController.getPage(restLink));
@@ -312,11 +327,26 @@ public class LinkFixer {
 		content = inputIn;
 	}
 
-	// a write to file
-	public static void writeTo(StringBuilder result, String name) {
+	// write to file
+	public static void writeTo(String name, StringBuilder result) {
+		writeTo(name,result.toString());
+	}
+
+	public static void writeTo(String name, String result) {
 		File file = new File(name);
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-			writer.write(result.toString());
+			writer.write(result);
+			writer.flush();
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+
+	// append to file
+	public static void appendTo(String name, String content) {
+		File file = new File(name);
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+			writer.append(content);
 			writer.flush();
 		} catch (Exception e) {
 			log.error(e);
