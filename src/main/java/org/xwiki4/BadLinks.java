@@ -20,7 +20,7 @@ public class BadLinks {
 		String name;
 	}
 
-	private List<BadLinksStruct> links = new LinkedList<>();
+	private List<BadLinksStruct> linkList = new LinkedList<>();
 
 	private ArrayList<String> parentLinks = new ArrayList<String>();
 	private ArrayList<String> realLinks = new ArrayList<String>();
@@ -39,19 +39,18 @@ public class BadLinks {
 
 	private void findLinks(Document doc) {
 		Elements links = doc.select("a:nth-child(1)[target=top][href]");
+		Elements urlel = doc.select("td.url:nth-child(2)");
+		Elements namel = doc.select("tr:nth-child(2) td:nth-child(2)");
+		int index = -1;
 		for (Element link : links) {
-			if (links.indexOf(link) % 2 != 0)
+			if (links.indexOf(link) % 2 != 0) {
 				realLinks.add(link.attr("abs:href"));
-			else
+			} else {
 				parentLinks.add(link.attr("abs:href"));
-		}
-		Elements urls = doc.select("td.url:nth-child(2)");
-		for (Element curl : urls) {
-			this.urls.add(curl.text().replaceAll("[`']", ""));
-		}
-		Elements names = doc.select("tr:nth-child(2) td:nth-child(2)");
-		for (Element name : names) {
-			this.names.add(name.text().replaceAll("[`']", ""));
+				index++;
+				this.urls.add(urlel.get(index).text().replaceAll("[`']", ""));
+				this.names.add(namel.get(index).text().replaceAll("[`']", ""));
+			}
 		}
 	}
 
