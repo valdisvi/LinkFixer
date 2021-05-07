@@ -7,8 +7,6 @@ public class IntegrationTest {
 
 	@Test
 	public void testGetFixer() {
-		LinkFixer.setDontChange(true);
-		LinkFixer.setVerbose(true);
 		LinkFixer.getLinkFixer("TestTxt/" + "linkchecker.html", "", "");
 
 		// TestUtility.writeTo(LinkFixer.getInput(), "TestTxt/" +

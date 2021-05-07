@@ -2,9 +2,11 @@ package org.xwiki4;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
 
 /*
  * @author Edmunds Ozolins
@@ -13,10 +15,9 @@ import java.util.regex.Pattern;
 
 public class LinkFixer {
 
+	private static Logger log = Logger.getLogger(LinkFixer.class);
 	private static StringBuffer input;
-	private static ArrayList<String> badLinksList;
 	private static boolean verbose = false; // whether to print out execution info
-	private static boolean dontChange = false;
 	private static String resultFileLocation = ""; // this is the result of the LinkFixer
 
 	// fix url
@@ -108,8 +109,7 @@ public class LinkFixer {
 		try {
 			Matcher matcher = pattern.matcher(input);
 			if (matcher.find()) {
-				if (verbose)
-					System.out.println("Found:" + badLink);
+				log.debug("Found:" + badLink);
 				String[] split;
 				split = badLink.split("/");
 				matchAndReplace("(\\h)*(\\{)\\2{1}([^{]*?)=\"([^{]*?)(" + correctInput(badLink)
@@ -127,8 +127,7 @@ public class LinkFixer {
 		try {
 			Matcher matcher = pattern.matcher(input);
 			if (matcher.find()) {
-				if (verbose)
-					System.out.println("Found:" + badLink);
+				log.debug("Found:" + badLink);
 				fixLabel(badLink);
 				fixNewWindow(badLink);
 				fixAttach(badLink);
@@ -168,13 +167,11 @@ public class LinkFixer {
 			try {
 				Integer.parseInt(replacement);
 				input = new StringBuffer(matcher.replaceAll(" " + matcher.group(Integer.parseInt(replacement)) + " "));
-				if (verbose)
-					System.out.println("Fixed!");
+				log.info("Fixed!");
 			} catch (NumberFormatException e) {
 				// not a number just replace
 				input = new StringBuffer(matcher.replaceAll(replacement));
-				if (verbose)
-					System.out.println("Fixed!");
+				log.info("Fixed!");
 			}
 		} catch (IllegalStateException e) {
 			// doesn't match
@@ -197,6 +194,7 @@ public class LinkFixer {
 
 	public static void getLinkFixer(String inputFile, String username, String password) {
 		BadLinks badLinks = new BadLinks();
+		List<LinkStruct> linkList;
 		File resultFile;
 		try {
 			// don't do anything if file doesn't exist
@@ -206,22 +204,18 @@ public class LinkFixer {
 
 			File file = new File(inputFile);
 			badLinks.findLinks(file);
-			System.out.println(badLinks);
-			badLinksList = new ArrayList(badLinks.getParentLinks());
-
-			if (verbose)
-				System.out.println("XWiki broken links count:" + badLinks.getErrorCount());
+			log.trace(badLinks);
+			linkList = badLinks.getLinks();
+			log.debug("XWiki broken links count:" + badLinks.getErrorCount());
 
 			// do the actual fixing
-			for (int i = 0; i < badLinksList.size(); i++)
-				processData(inputFile, badLinksList.get(i), username, password, i);
+			for (LinkStruct clink : linkList)
+				processData(clink);
 
-			if (verbose)
-				System.out.println("Done fixing!");
+			log.info("Done fixing!");
 
 		} catch (IOException e) {
-			System.err.println("LinkFixer exception!");
-			e.printStackTrace();
+			log.error("LinkFixer exception!" + e);
 		} finally {
 			// clean up the results
 			resultFile = new File(resultFileLocation);
@@ -231,12 +225,26 @@ public class LinkFixer {
 	}
 
 	// a combination of reading/link fixing/writing
-	public static void processData(String inputFile, String link, String username, String password, int index) {
-		if (verbose)
-			System.out.println("processData(inputFile" + inputFile + " link:" + link + " index:" + index);
+	public static void processData(LinkStruct links) {
 
-		String[] split;
-		String translationLink;
+		String language = "";
+		boolean comment = false;
+		if (links.parentLink.contains("?language="))
+			try {
+				language = links.parentLink.split("\\?language=")[1];
+			} catch (Exception e) {
+				log.error("Couldn't get language for link:" + links.parentLink);
+			}
+		if (links.parentLink.contains("#Comments"))
+			comment = true;
+
+		String info = "";
+		if (!"".equals(language))
+			info = " lang:" + language;
+		if (comment)
+			info = info + ", comment";
+
+		log.debug(links.parentLink + info + " :" + links.realLink);
 
 		/*-
 		//StringBuffer input = new StringBuffer(XWikiController.getPage(restLink));
@@ -288,22 +296,6 @@ public class LinkFixer {
 
 	public static void setInput(StringBuffer inputIn) {
 		input = inputIn;
-	}
-
-	public static boolean getVerbose() {
-		return verbose;
-	}
-
-	public static void setVerbose(boolean value) {
-		verbose = value;
-	}
-
-	public static boolean getDontChange() {
-		return dontChange;
-	}
-
-	public static void setDontChange(boolean value) {
-		dontChange = value;
 	}
 
 }

@@ -13,37 +13,7 @@ import org.jsoup.select.Elements;
 
 public class BadLinks {
 
-	private class LinkStruct implements Comparable<LinkStruct> {
 
-		String parentLink;
-		String realLink;
-		String url;
-		String name;
-
-		public LinkStruct(String parentLink, String realLink, String url, String name) {
-			this.parentLink = parentLink;
-			this.realLink = realLink;
-			this.url = url;
-			this.name = name;
-		}
-
-		@Override
-		public String toString() {
-			return parentLink + " " + realLink + " " + url + " " + name;
-		}
-
-		@Override
-		public int compareTo(LinkStruct other) {
-			int status = parentLink.compareTo(other.parentLink);
-			if (status == 0) {
-				status = realLink.compareTo(other.realLink);
-				if (status == 0)
-					status = url.compareTo(other.url);
-			}
-			return status;
-		}
-
-	}
 
 	private List<LinkStruct> linkList = new LinkedList<>();
 
@@ -82,32 +52,8 @@ public class BadLinks {
 		return linkList.size();
 	}
 
-	public List<String> getParentLinks() {
-		List<String> list = new LinkedList<>();
-		for (LinkStruct struct : linkList)
-			list.add(struct.parentLink);
-		return list;
-	}
-
-	public List<String> getRealLinks() {
-		List<String> list = new LinkedList<>();
-		for (LinkStruct struct : linkList)
-			list.add(struct.realLink);
-		return list;
-	}
-
-	public List<String> getUrls() {
-		List<String> list = new LinkedList<>();
-		for (LinkStruct struct : linkList)
-			list.add(struct.url);
-		return list;
-	}
-
-	public List<String> getNames() {
-		List<String> list = new LinkedList<>();
-		for (LinkStruct struct : linkList)
-			list.add(struct.name);
-		return list;
+	public List<LinkStruct> getLinks() {
+		return linkList;
 	}
 
 	@Override

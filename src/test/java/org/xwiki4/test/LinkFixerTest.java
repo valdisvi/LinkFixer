@@ -154,12 +154,10 @@ public class LinkFixerTest {
 	@Test
 	@Ignore
 	public void testGetFixer() {
-		LinkFixer.setDontChange(true);
 		LinkFixer.getLinkFixer("TestTxt/" + "badlinks.html", "", "");
 		TestUtility.writeTo(LinkFixer.getInput(), "TestTxt/" + "getFixerResult.txt");
 		TestUtility.assertFiles("getFixerResult.txt", "GetFixer",
 				"GetFixer test failed, check that Main.GetFixer.WebHome.xar is set up on the local XWiki");
-		LinkFixer.setDontChange(false);
 	}
 
 }

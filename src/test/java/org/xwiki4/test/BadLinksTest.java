@@ -23,8 +23,6 @@ public class BadLinksTest {
 			e.printStackTrace();
 		}
 		assertEquals(958, badLinks.getErrorCount());
-		assertEquals(badLinks.getUrls().size(), badLinks.getNames().size());
-		assertEquals(badLinks.getParentLinks().size(), badLinks.getRealLinks().size());
 	}
 
 	@Test
@@ -38,10 +36,6 @@ public class BadLinksTest {
 			e.printStackTrace();
 		}
 		assertEquals(18, badLinks.getErrorCount());
-		assertEquals(badLinks.getUrls().size(), badLinks.getErrorCount());
-		assertEquals(badLinks.getUrls().size(), badLinks.getNames().size());
-		assertEquals(badLinks.getParentLinks().size(), badLinks.getRealLinks().size());
-
 		String badLinksString = "" //
 				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/\n"
 				+ "http://localhost:8080/xwiki/bin/view/TestPageLinkChecker/SimplePage/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/ http://www.eclipse.org/gmt/\n"
