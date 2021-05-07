@@ -22,7 +22,7 @@ public class TestUtility {
 	private static Logger log = Logger.getLogger(TestUtility.class);
 
 	public static void assertFiles(String name, String user, String message) {
-		writeTestFile(LinkFixer.getInput(), name);
+		writeTo(LinkFixer.getInput(), "TestTxt/" + name);
 		try {
 			assertEquals(user + message,
 					FileUtils.readFileToString(new File("TestTxt/Correct" + user + ".txt"), StandardCharsets.UTF_8),
@@ -32,17 +32,7 @@ public class TestUtility {
 		}
 	}
 
-	// a simple write
-	public static void writeTestFile(StringBuilder result, String name) {
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File("TestTxt/" + name)))) {
-			writer.write(result.toString());
-			writer.flush();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-	}
-
-	// a write to specific place
+	// a write to file
 	public static void writeTo(StringBuilder result, String name) {
 		File file = new File(name);
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -53,17 +43,16 @@ public class TestUtility {
 		}
 	}
 
-	// a simple read
-	public static StringBuilder readTestFile(String name) {
+	// read from file
+	public static StringBuilder readFrom(String name) {
 		StringBuilder result = new StringBuilder();
 		int c = 0;
 		try (BufferedReader reader = new BufferedReader(new FileReader(new File(name)))) {
 			while ((c = reader.read()) != -1) {
 				result.append((char) c);
 			}
-			reader.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 		return result;
 	}

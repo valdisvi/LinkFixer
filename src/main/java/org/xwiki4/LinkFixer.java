@@ -255,9 +255,8 @@ public class LinkFixer {
 		}
 		// Fix pages with hidden space
 		fullName = fullName.replace(pagePrefix, "Main");
-		System.err.println(fullName);
+		
 		log.debug(fullName + " : " + links.parentLink + info + " : " + links.realLink);
-
 		content = new StringBuilder(database.getDocument(fullName, language));
 
 		return null;
@@ -312,11 +311,4 @@ public class LinkFixer {
 	public static void setInput(StringBuilder inputIn) {
 		content = inputIn;
 	}
-
-	public static void main(String[] args) {
-		String url = "http://localhost:8080/TestPageLinkChecker/SimplePage?aa=aa&bb=bb#cc";
-		String[] parts = url.split("(/|\\?|#)");
-		System.err.println(Arrays.toString(parts));
-	}
-
 }

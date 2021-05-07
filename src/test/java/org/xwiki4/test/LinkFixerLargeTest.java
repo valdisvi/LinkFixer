@@ -15,7 +15,7 @@ public class LinkFixerLargeTest {
 
 	@Before
 	public void setUp() {
-		LinkFixer.setInput(TestUtility.readTestFile("TestTxt/BibleTest.txt"));
+		LinkFixer.setInput(TestUtility.readFrom("TestTxt/BibleTest.txt"));
 	}
 
 	// large test

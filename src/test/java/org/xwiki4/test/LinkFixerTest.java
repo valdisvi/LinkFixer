@@ -17,7 +17,7 @@ public class LinkFixerTest {
 
 	@Before
 	public void setUp() {
-		LinkFixer.setInput(TestUtility.readTestFile("TestTxt/Test1.txt"));
+		LinkFixer.setInput(TestUtility.readFrom("TestTxt/Test1.txt"));
 	}
 
 	@Test
