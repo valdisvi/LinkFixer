@@ -289,7 +289,7 @@ public class LinkFixer {
 		// don't write if empty
 		if (input.length() > 0 && fixed == true && dontChange == false) {
 			// write the changes to text file
-			// TODO FileManipulation.writeTo(input, resultFileLocation);
+			// TODO TestUtility.writeTo(input, resultFileLocation);
 			// push the changes to XWiki
 			// TODO XWikiController.setPage(restLink, resultFileLocation, username,
 			// password);

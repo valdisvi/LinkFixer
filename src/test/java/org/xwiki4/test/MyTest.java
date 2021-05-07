@@ -11,7 +11,7 @@ public class MyTest {
 		LinkFixer.setVerbose(true);
 		LinkFixer.getLinkFixer("TestTxt/" + "linkchecker.html", "", "");
 
-		// FileManipulation.writeTo(LinkFixer.getInput(), "TestTxt/" +
+		// TestUtility.writeTo(LinkFixer.getInput(), "TestTxt/" +
 		// "getFixerResult.txt");
 		// TestUtility.assertFiles("getFixerResult.txt", "GetFixer",
 		// "GetFixer test failed, check that Main.GetFixer.WebHome.xar is set up on the

@@ -3,7 +3,6 @@ package org.xwiki4.test;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xwiki4.FileManipulation;
 import org.xwiki4.LinkFixer;
 
 /*
@@ -18,7 +17,7 @@ public class LinkFixerTest {
 
 	@Before
 	public void setUp() {
-		LinkFixer.setInput(FileManipulation.readTestFile("TestTxt/Test1.txt"));
+		LinkFixer.setInput(TestUtility.readTestFile("TestTxt/Test1.txt"));
 	}
 
 	@Test
@@ -157,7 +156,7 @@ public class LinkFixerTest {
 	public void testGetFixer() {
 		LinkFixer.setDontChange(true);
 		LinkFixer.getLinkFixer("TestTxt/" + "badlinks.html", "", "");
-		FileManipulation.writeTo(LinkFixer.getInput(), "TestTxt/" + "getFixerResult.txt");
+		TestUtility.writeTo(LinkFixer.getInput(), "TestTxt/" + "getFixerResult.txt");
 		TestUtility.assertFiles("getFixerResult.txt", "GetFixer",
 				"GetFixer test failed, check that Main.GetFixer.WebHome.xar is set up on the local XWiki");
 		LinkFixer.setDontChange(false);

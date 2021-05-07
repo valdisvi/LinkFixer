@@ -2,7 +2,6 @@ package org.xwiki4.test;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki4.FileManipulation;
 import org.xwiki4.LinkFixer;
 
 /*
@@ -16,7 +15,7 @@ public class LinkFixerLargeTest {
 
 	@Before
 	public void setUp() {
-		LinkFixer.setInput(FileManipulation.readTestFile("TestTxt/BibleTest.txt"));
+		LinkFixer.setInput(TestUtility.readTestFile("TestTxt/BibleTest.txt"));
 	}
 
 	// large test
