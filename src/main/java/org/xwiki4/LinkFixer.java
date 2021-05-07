@@ -15,11 +15,6 @@ public class LinkFixer {
 
 	private static StringBuffer input;
 	private static ArrayList<String> badLinksList;
-	private static ArrayList<String> locationsList;
-	private static ArrayList<String> urlsList;
-	private static ArrayList<String> namesList;
-	private static boolean found; // whether a match has been found
-	private static boolean fixed; // whether the match has been fixed
 	private static boolean verbose = false; // whether to print out execution info
 	private static boolean dontChange = false;
 	private static String resultFileLocation = ""; // this is the result of the LinkFixer
@@ -173,17 +168,13 @@ public class LinkFixer {
 			try {
 				Integer.parseInt(replacement);
 				input = new StringBuffer(matcher.replaceAll(" " + matcher.group(Integer.parseInt(replacement)) + " "));
-				found = true;
 				if (verbose)
 					System.out.println("Fixed!");
-				fixed = true;
 			} catch (NumberFormatException e) {
 				// not a number just replace
 				input = new StringBuffer(matcher.replaceAll(replacement));
-				found = true;
 				if (verbose)
 					System.out.println("Fixed!");
-				fixed = true;
 			}
 		} catch (IllegalStateException e) {
 			// doesn't match
@@ -206,9 +197,6 @@ public class LinkFixer {
 
 	public static void getLinkFixer(String inputFile, String username, String password) {
 		BadLinks badLinks = new BadLinks();
-		String link;
-		String[] split;
-		String[] split2;
 		File resultFile;
 		try {
 			// don't do anything if file doesn't exist
@@ -220,9 +208,6 @@ public class LinkFixer {
 			badLinks.findLinks(file);
 			System.out.println(badLinks);
 			badLinksList = new ArrayList(badLinks.getParentLinks());
-			locationsList = new ArrayList(badLinks.getRealLinks());
-			urlsList = new ArrayList(badLinks.getUrls());
-			namesList = new ArrayList(badLinks.getNames());
 
 			if (verbose)
 				System.out.println("XWiki broken links count:" + badLinks.getErrorCount());

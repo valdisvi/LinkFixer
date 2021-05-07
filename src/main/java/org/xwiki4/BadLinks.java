@@ -2,6 +2,7 @@ package org.xwiki4;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,13 +13,14 @@ import org.jsoup.select.Elements;
 
 public class BadLinks {
 
-	private class BadLinksStruct {
+	private class LinkStruct implements Comparable<LinkStruct> {
+
 		String parentLink;
 		String realLink;
 		String url;
 		String name;
 
-		public BadLinksStruct(String parentLink, String realLink, String url, String name) {
+		public LinkStruct(String parentLink, String realLink, String url, String name) {
 			this.parentLink = parentLink;
 			this.realLink = realLink;
 			this.url = url;
@@ -30,9 +32,20 @@ public class BadLinks {
 			return parentLink + " " + realLink + " " + url + " " + name;
 		}
 
+		@Override
+		public int compareTo(LinkStruct other) {
+			int status = parentLink.compareTo(other.parentLink);
+			if (status == 0) {
+				status = realLink.compareTo(other.realLink);
+				if (status == 0)
+					status = url.compareTo(other.url);
+			}
+			return status;
+		}
+
 	}
 
-	private List<BadLinksStruct> linkList = new LinkedList<>();
+	private List<LinkStruct> linkList = new LinkedList<>();
 
 	public void findLinks(String url) throws IOException {
 		Document doc = Jsoup.connect(url).get();
@@ -58,10 +71,11 @@ public class BadLinks {
 				String realLink = link.attr("abs:href");
 				String url = urlel.get(index).text().replaceAll("[`']", "");
 				String name = namel.get(index).text().replaceAll("[`']", "");
-				BadLinksStruct badLinkStruct = new BadLinksStruct(parentLink, realLink, url, name);
+				LinkStruct badLinkStruct = new LinkStruct(parentLink, realLink, url, name);
 				linkList.add(badLinkStruct);
 			}
 		}
+		Collections.sort(linkList);
 	}
 
 	public int getErrorCount() {
@@ -70,35 +84,35 @@ public class BadLinks {
 
 	public List<String> getParentLinks() {
 		List<String> list = new LinkedList<>();
-		for (BadLinksStruct struct : linkList)
+		for (LinkStruct struct : linkList)
 			list.add(struct.parentLink);
 		return list;
 	}
 
 	public List<String> getRealLinks() {
 		List<String> list = new LinkedList<>();
-		for (BadLinksStruct struct : linkList)
+		for (LinkStruct struct : linkList)
 			list.add(struct.realLink);
 		return list;
 	}
 
 	public List<String> getUrls() {
 		List<String> list = new LinkedList<>();
-		for (BadLinksStruct struct : linkList)
+		for (LinkStruct struct : linkList)
 			list.add(struct.url);
 		return list;
 	}
 
 	public List<String> getNames() {
 		List<String> list = new LinkedList<>();
-		for (BadLinksStruct struct : linkList)
+		for (LinkStruct struct : linkList)
 			list.add(struct.name);
 		return list;
 	}
 
 	@Override
 	public String toString() {
-		return linkList.toString().replace("[", "").replace("]", "").replace(", ", "\n").replaceAll("$", "\n");
+		return linkList.toString().replace("[", "").replace("]", "\n").replace(", ", "\n");
 	}
 
 }
