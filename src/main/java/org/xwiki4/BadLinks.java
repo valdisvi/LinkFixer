@@ -50,30 +50,16 @@ public class BadLinks {
 		Elements namel = doc.select("tr:nth-child(2) td:nth-child(2)");
 		int index = -1;
 		String parentLink = "";
-		String realLink = "";
-		String url = "";
-		String name = "";
-		boolean first = true;
 		for (Element link : links) {
-			if (links.indexOf(link) % 2 != 0) {
-				if (first) {
-					System.err.println("!= 0");
-					first = false;
-				}
-				realLink = link.attr("abs:href");
-				// ---------------
-				url = urlel.get(index).text().replaceAll("[`']", "");
-				name = namel.get(index).text().replaceAll("[`']", "");
+			if (links.indexOf(link) % 2 == 0) {
+				parentLink = link.attr("abs:href");
+			} else {
+				index++;
+				String realLink = link.attr("abs:href");
+				String url = urlel.get(index).text().replaceAll("[`']", "");
+				String name = namel.get(index).text().replaceAll("[`']", "");
 				BadLinksStruct badLinkStruct = new BadLinksStruct(parentLink, realLink, url, name);
 				linkList.add(badLinkStruct);
-				System.err.println(badLinkStruct);
-			} else {
-				if (first) {
-					System.err.println("else");
-					first = false;
-				}
-				parentLink = link.attr("abs:href");
-				index++;
 			}
 		}
 	}
