@@ -18,6 +18,19 @@ public class BadLinks {
 		String realLink;
 		String url;
 		String name;
+
+		public BadLinksStruct(String parentLink, String realLink, String url, String name) {
+			this.parentLink = parentLink;
+			this.realLink = realLink;
+			this.url = url;
+			this.name = name;
+		}
+
+		@Override
+		public String toString() {
+			return parentLink + " " + realLink + " " + url + " " + name;
+		}
+
 	}
 
 	private List<BadLinksStruct> linkList = new LinkedList<>();
@@ -42,11 +55,32 @@ public class BadLinks {
 		Elements urlel = doc.select("td.url:nth-child(2)");
 		Elements namel = doc.select("tr:nth-child(2) td:nth-child(2)");
 		int index = -1;
+		String parentLink = "";
+		String realLink = "";
+		String url = "";
+		String name = "";
+		boolean first = true;
 		for (Element link : links) {
 			if (links.indexOf(link) % 2 != 0) {
+				if (first) {
+					System.err.println("!= 0");
+					first = false;
+				}
 				realLinks.add(link.attr("abs:href"));
+				realLink = link.attr("abs:href");
+				// ---------------
+				url = urlel.get(index).text().replaceAll("[`']", "");
+				name = namel.get(index).text().replaceAll("[`']", "");
+				BadLinksStruct badLinkStruct = new BadLinksStruct(parentLink, realLink, url, name);
+				linkList.add(badLinkStruct);
+				System.err.println(badLinkStruct);
 			} else {
+				if (first) {
+					System.err.println("else");
+					first = false;
+				}
 				parentLinks.add(link.attr("abs:href"));
+				parentLink = link.attr("abs:href");
 				index++;
 				this.urls.add(urlel.get(index).text().replaceAll("[`']", ""));
 				this.names.add(namel.get(index).text().replaceAll("[`']", ""));
@@ -80,7 +114,8 @@ public class BadLinks {
 		for (int i = 0; i < parentLinks.size(); i++) {
 			builder.append(parentLinks.get(i) + " " + realLinks.get(i) + " " + urls.get(i) + " " + names.get(i) + "\n");
 		}
-		return builder.toString();
+		// return builder.toString();
+		return linkList.toString().replace("[", "").replace("]", "").replace(", ", "\n").replaceAll("$", "\n");
 	}
 
 }
