@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 public class LinkFixer {
 
 	private static Logger log = Logger.getLogger(LinkFixer.class);
-	private static StringBuilder content;
+	private static StringBuilder content; // Is needed to reuse existing tests and implementation!
 	private static final String pagePrefix = "odo.lv";
 	private static final String sourceLog = "logs/source.log";
 	private static final String targetLog = "logs/target.log";
@@ -329,7 +329,7 @@ public class LinkFixer {
 
 	// write to file
 	public static void writeTo(String name, StringBuilder result) {
-		writeTo(name,result.toString());
+		writeTo(name, result.toString());
 	}
 
 	public static void writeTo(String name, String result) {
@@ -345,7 +345,7 @@ public class LinkFixer {
 	// append to file
 	public static void appendTo(String name, String content) {
 		File file = new File(name);
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
 			writer.append(content);
 			writer.flush();
 		} catch (Exception e) {

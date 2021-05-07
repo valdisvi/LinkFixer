@@ -20,10 +20,10 @@ public class BadLinksTest {
 		BadLinks badLinks = new BadLinks();
 		try {
 			badLinks.findLinks("https://odo.lv/xwiki/bin/download/Challenges/WebHome/linkchecker.html");
-		} catch (IOException e) {
-			e.printStackTrace();
+			assertEquals(958, badLinks.getErrorCount());
+		} catch (Exception e) {
+			log.error(e);
 		}
-		assertEquals(958, badLinks.getErrorCount());
 	}
 
 	@Test
