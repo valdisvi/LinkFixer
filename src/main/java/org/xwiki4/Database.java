@@ -21,16 +21,30 @@ public class Database {
 		}
 	}
 
-	public void getDocument() {
+	public String getDocument(String fullname, String language) {
 		try {
-			Statement stmt = con.createStatement(); // Create a Statement
-			// Execute the statement and store results in ResultSet object
-			ResultSet rs = stmt.executeQuery("select count(XWD_ID) from xwikidoc");
-			while (rs.next())
-				System.out.println(rs.getInt(1)); // Iterate through ResultSet
+			String sql = "";
+			if (language == null || "".equals(language))
+				sql = "select XWD_CONTENT from xwikidoc where XWD_FULLNAME=?";
+			else
+				sql = "SELECT * FROM xwiki.xwikidoc where XWD_FULLNAME = ? and (XWD_LANGUAGE=? or (XWD_DEFAULT_LANGUAGE=? and XWD_TRANSLATION=0));";
+			PreparedStatement preparedStatement = con.prepareStatement(sql);
+			preparedStatement.setString(1, fullname);
+			if (language != null && !"".equals(language)) {
+				preparedStatement.setString(2, language);
+				preparedStatement.setString(3, language);
+			}
+			ResultSet rs = preparedStatement.executeQuery();
+
+			rs.next();
+			logValues(rs);
+
+			return rs.getString("XWD_CONTENT");
+
 		} catch (Exception e) {
 			log.error(e);
 		}
+		return "";
 
 	}
 
@@ -41,5 +55,21 @@ public class Database {
 			log.error(e);
 		}
 
+	}
+
+	public void logValues(ResultSet rs) {
+		StringBuilder sb = new StringBuilder();
+		try {
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int colNo = rsmd.getColumnCount();
+			sb.append("\n----------\n");
+			for (int i = 1; i <= colNo; i++) {
+				sb.append(rsmd.getColumnName(i) + ": '" + rs.getString(i) + "'\n");
+			}
+			sb.append("----------");
+			log.debug(sb.toString());
+		} catch (Exception e) {
+			log.error(e);
+		}
 	}
 }

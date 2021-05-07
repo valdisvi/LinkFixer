@@ -16,9 +16,7 @@ import org.apache.log4j.Logger;
 public class LinkFixer {
 
 	private static Logger log = Logger.getLogger(LinkFixer.class);
-	private static StringBuffer input;
-	private static boolean verbose = false; // whether to print out execution info
-	private static String resultFileLocation = ""; // this is the result of the LinkFixer
+	private static StringBuilder input;
 
 	// fix url
 	// plain implicit url
@@ -32,12 +30,10 @@ public class LinkFixer {
 					Pattern.CASE_INSENSITIVE);
 			Matcher matcher = pattern.matcher(input);
 			matcher.find();
-
-			if (matcher.group(3).toString().equals("\n") || matcher.group(5).toString().equals("\n")
-					|| matcher.group(3).toString().equals("\r") || matcher.group(5).toString().equals("\r")) {
+			if (matcher.group(3).equals("\n") || matcher.group(5).equals("\n") || matcher.group(3).equals("\r")
+					|| matcher.group(5).equals("\r")) {
 				replacement = "\n";
 			}
-			;
 		} catch (Exception e) {
 
 		}
@@ -154,23 +150,23 @@ public class LinkFixer {
 			matcher.find();
 
 			// restore newlines
-			if (matcher.group(1) != null && matcher.group(1).toString().equals("\n"))
+			if (matcher.group(1) != null && matcher.group(1).equals("\n"))
 				replacement = "\n ";
-			if (matcher.group(3) != null && matcher.group(3).toString().equals("\n"))
+			if (matcher.group(3) != null && matcher.group(3).equals("\n"))
 				replacement = " \n";
-			if (matcher.group(1) != null && matcher.group(1).toString().equals("\r"))
+			if (matcher.group(1) != null && matcher.group(1).equals("\r"))
 				replacement = "\r ";
-			if (matcher.group(3) != null && matcher.group(3).toString().equals("\r"))
+			if (matcher.group(3) != null && matcher.group(3).equals("\r"))
 				replacement = " \r";
 
 			// if replacement is actually int replace with group
 			try {
 				Integer.parseInt(replacement);
-				input = new StringBuffer(matcher.replaceAll(" " + matcher.group(Integer.parseInt(replacement)) + " "));
+				input = new StringBuilder(matcher.replaceAll(" " + matcher.group(Integer.parseInt(replacement)) + " "));
 				log.info("Fixed!");
 			} catch (NumberFormatException e) {
 				// not a number just replace
-				input = new StringBuffer(matcher.replaceAll(replacement));
+				input = new StringBuilder(matcher.replaceAll(replacement));
 				log.info("Fixed!");
 			}
 		} catch (IllegalStateException e) {
@@ -182,20 +178,15 @@ public class LinkFixer {
 	private static String correctInput(String input) {
 		String result = input;
 		String specials = "[^$.|?*+(){}";
-
 		for (int i = 0; i < specials.length(); i++) {
 			result = result.replaceAll("\\" + specials.charAt(i), "\\\\\\" + specials.charAt(i));
 		}
-
-		result.replaceAll("/", "\\/");
-
-		return result;
+		return result.replace("/", "\\/");
 	}
 
-	public static void getLinkFixer(String inputFile, String username, String password) {
+	public static void getLinkFixer(String inputFile) {
 		BadLinks badLinks = new BadLinks();
 		List<LinkStruct> linkList;
-		File resultFile;
 		try {
 			// don't do anything if file doesn't exist
 			File f = new File(inputFile);
@@ -209,17 +200,26 @@ public class LinkFixer {
 			log.debug("XWiki broken links count:" + badLinks.getErrorCount());
 
 			// do the actual fixing
-			for (LinkStruct clink : linkList)
-				processData(clink);
+			String prevParent = null;
+			for (LinkStruct clink : linkList) {
+				if (prevParent == null) {
+					prevParent = clink.parentLink;
+					continue;
+				}
+				if (clink.parentLink.equals(prevParent)) {
+					// Update changes
+					processData(clink);
+				} else {
+					prevParent = clink.parentLink;
+					// COMMIT changes
+				}
+
+			}
 
 			log.info("Done fixing!");
 
 		} catch (IOException e) {
 			log.error("LinkFixer exception!" + e);
-		} finally {
-			// clean up the results
-			resultFile = new File(resultFileLocation);
-			resultFile.delete();
 		}
 
 	}
@@ -290,11 +290,11 @@ public class LinkFixer {
 
 	}
 
-	public static StringBuffer getInput() {
+	public static StringBuilder getInput() {
 		return input;
 	}
 
-	public static void setInput(StringBuffer inputIn) {
+	public static void setInput(StringBuilder inputIn) {
 		input = inputIn;
 	}
 

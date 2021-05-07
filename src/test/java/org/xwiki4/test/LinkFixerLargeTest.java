@@ -9,9 +9,9 @@ import org.xwiki4.LinkFixer;
  */
 public class LinkFixerLargeTest {
 
-	public static String noMatch = " does not match expected";
-	public static String noChange = " should not have changed text";
-	public static String defaultLink = "http://www.vardene.lv/index.php/Lokaliz%c4%93%c5%a1anas_rokasgr%c4%81mata";
+	public static final String noMatch = " does not match expected";
+	public static final String noChange = " should not have changed text";
+	public static final String defaultLink = "http://www.vardene.lv/index.php/Lokaliz%c4%93%c5%a1anas_rokasgr%c4%81mata";
 
 	@Before
 	public void setUp() {

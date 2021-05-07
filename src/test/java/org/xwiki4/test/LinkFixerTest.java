@@ -11,9 +11,9 @@ import org.xwiki4.LinkFixer;
 
 public class LinkFixerTest {
 
-	public static String noMatch = " does not match expected";
-	public static String noChange = " should not have changed text";
-	public static String defaultLink = "http://www.vardene.lv/index.php/Lokaliz%c4%93%c5%a1anas_rokasgr%c4%81mata";
+	public static final String noMatch = " does not match expected";
+	public static final String noChange = " should not have changed text";
+	public static final String defaultLink = "http://www.vardene.lv/index.php/Lokaliz%c4%93%c5%a1anas_rokasgr%c4%81mata";
 
 	@Before
 	public void setUp() {
@@ -154,7 +154,7 @@ public class LinkFixerTest {
 	@Test
 	@Ignore
 	public void testGetFixer() {
-		LinkFixer.getLinkFixer("TestTxt/" + "badlinks.html", "", "");
+		LinkFixer.getLinkFixer("TestTxt/" + "badlinks.html");
 		TestUtility.writeTo(LinkFixer.getInput(), "TestTxt/" + "getFixerResult.txt");
 		TestUtility.assertFiles("getFixerResult.txt", "GetFixer",
 				"GetFixer test failed, check that Main.GetFixer.WebHome.xar is set up on the local XWiki");

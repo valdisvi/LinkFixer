@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.Assert;
+import org.apache.log4j.Logger;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -13,6 +13,7 @@ import org.xwiki4.BadLinks;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BadLinksTest {
+	private static Logger log = Logger.getLogger(BadLinksTest.class);
 
 	@Test
 	public void test01FindLinks() {
@@ -31,7 +32,7 @@ public class BadLinksTest {
 		try {
 			File file = new File("src/test/resources/badlinks.html");
 			badLinks.findLinks(file);
-			System.out.println(badLinks);
+			log.debug(badLinks);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
