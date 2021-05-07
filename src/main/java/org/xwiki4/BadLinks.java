@@ -93,4 +93,14 @@ public class BadLinks {
 	public ArrayList<String> getNames() {
 		return names;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < parentLinks.size(); i++) {
+			builder.append(parentLinks.get(i) + " " + realLinks.get(i) + " " + urls.get(i) + " " + names.get(i) + "\n");
+		}
+		return builder.toString();
+	}
+
 }

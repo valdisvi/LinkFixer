@@ -207,9 +207,7 @@ public class LinkFixer {
 
 	public static void getLinkFixer(String inputFile, String username, String password) {
 		BadLinks badLinks = new BadLinks();
-		String restLink = ""; // ends with webhome
-		String restLink2 = ""; // ends with last entry in link
-		String restTail = "";
+		String link;
 		String[] split;
 		String[] split2;
 		File resultFile;
@@ -220,6 +218,7 @@ public class LinkFixer {
 
 			File file = new File(inputFile);
 			badLinks.findLinks(file);
+			System.out.println(badLinks);
 			badLinksList = new ArrayList(badLinks.getParentLinks());
 			locationsList = new ArrayList(badLinks.getRealLinks());
 			urlsList = new ArrayList(badLinks.getUrls());
@@ -229,46 +228,8 @@ public class LinkFixer {
 				System.out.println("XWiki broken links count:" + badLinks.getErrorCount());
 
 			// do the actual fixing
-			for (int i = 0; i < badLinksList.size(); i++) {
-
-				// form the rest link
-				split = locationsList.get(i).split("/");
-				restLink = split[0] + "//" + split[2] + "/" + split[3] + "/" + "rest/wikis/xwiki";
-				restLink2 = split[0] + "//" + split[2] + "/" + split[3] + "/" + "rest/wikis/xwiki";
-				restTail = "";
-				for (int k = 6; k < split.length; k++) {
-					// note that there are two types of restlinks
-					// split2 is used to append parameters
-					// put with ?
-					// restLink2 mirrors restLink most of the time
-					if (split[k].contains("?") && split[k].charAt(0) != '?') {
-						split2 = split[k].split("\\?");
-						restLink += "/spaces/" + split2[0];
-						restLink2 += "/spaces/" + split2[0];
-						restTail += "?" + split2[1];
-					} else if (split[k].charAt(0) != '?') {
-						restLink += "/spaces/" + split[k];
-						restLink2 += "/spaces/" + split[k];
-					} else {
-						restTail = split[k];
-					}
-				}
-
-				restLink += "/pages/WebHome" + restTail;
-				restLink2 += restTail;
-
-				// double reverse to replace last
-				restLink2 = StringUtils.reverse(StringUtils.reverse(restLink2).replaceFirst("secaps", "segap"));
-
-				found = false;
-
-				processData(inputFile, restLink, username, password, i);
-				// try with differently formed page if found == false
-				if (found == false) {
-					processData(inputFile, restLink2, username, password, i);
-				}
-
-			}
+			for (int i = 0; i < badLinksList.size(); i++)
+				processData(inputFile, badLinksList.get(i), username, password, i);
 
 			if (verbose)
 				System.out.println("Done fixing!");
@@ -285,49 +246,54 @@ public class LinkFixer {
 	}
 
 	// a combination of reading/link fixing/writing
-	public static void processData(String inputFile, String restLink, String username, String password, int index) {
+	public static void processData(String inputFile, String link, String username, String password, int index) {
+		if (verbose)
+			System.out.println("processData(inputFile" + inputFile + " link:" + link + " index:" + index);
 
 		String[] split;
 		String translationLink;
 
-		input = new StringBuffer(XWikiController.getPage(restLink));
-
+		/*-
+		//StringBuffer input = new StringBuffer(XWikiController.getPage(restLink));
+		
 		fixed = false;
-
+		
 		// switches between url and real url
 		// if no fix has been made
 		if (fixed == false) {
-			input = new StringBuffer(XWikiController.getPage(restLink));
+			// TODO input = new StringBuffer(XWikiController.getPage(restLink));
 			fixAny(urlsList.get(index));
 			if (fixed == false)
 				fixAny(badLinksList.get(index));
 		}
-
+		
 		if (fixed == false) {
 			if (badLinksList.get(index).contains("ftp") || badLinksList.get(index).contains(".")) {
 				fixFTP(namesList.get(index));
 			}
 		}
-
+		
 		split = inputFile.split("\\/");
-
+		
 		resultFileLocation = "/";
-
+		
 		for (int k = 0; k < split.length; k++) {
 			if (!split[k].isEmpty() && k != split.length - 1) {
 				resultFileLocation = resultFileLocation.concat(split[k] + "/");
 			}
 		}
-
+		
 		resultFileLocation = resultFileLocation.concat("fixResult.txt");
-
+		
 		// don't write if empty
 		if (input.length() > 0 && fixed == true && dontChange == false) {
 			// write the changes to text file
-			FileManipulation.writeTo(input, resultFileLocation);
+			// TODO FileManipulation.writeTo(input, resultFileLocation);
 			// push the changes to XWiki
-			XWikiController.setPage(restLink, resultFileLocation, username, password);
+			// TODO XWikiController.setPage(restLink, resultFileLocation, username,
+			// password);
 		}
+		*/
 
 	}
 
