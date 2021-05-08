@@ -362,7 +362,8 @@ public class LinkFixer {
 	 */
 	public static void processData(List<LinkStruct> linkList) {
 		Database database = new Database();
-		String language = "";
+		String currLang = "";
+		String prevLang = null;
 		String fullName = null;
 		String prevName = null;
 		int i = 0;
@@ -372,10 +373,11 @@ public class LinkFixer {
 				log.warn(fullName + " page is excluded");
 				continue;
 			}
-			language = getLanguage(clink.parentLink);
+			currLang = getLanguage(clink.parentLink);
 			if (prevName == null) {
 				prevName = fullName;
-				content = new StringBuilder(database.getDocument(fullName, language)); // get content for first entry
+				prevLang = currLang;
+				content = new StringBuilder(database.getDocument(fullName, currLang)); // get content for first entry
 				appendTo(sourceLog, "\n" + fullName + "--------------------\n");
 				appendTo(sourceLog, content.toString());
 				continue;
@@ -403,21 +405,22 @@ public class LinkFixer {
 			} else { // Finish previous and start new document
 				i = 0;
 				// Write back previous document to database
-				database.putDocument(fullName, language, content.toString());
+				database.putDocument(prevName, prevLang, content.toString());
 				// Log changes
 				appendTo(targetLog, "\n" + prevName + "--------------------\n");
 				appendTo(targetLog, content.toString()); // modified content
 				// New document
-				log.debug("New: " + fullName + ":" + language);
-				content = new StringBuilder(database.getDocument(fullName, language)); // get new content
+				log.debug("New: " + fullName + ":" + currLang);
+				content = new StringBuilder(database.getDocument(fullName, currLang)); // get new content
 				appendTo(sourceLog, "\n" + fullName + "--------------------\n");
 				appendTo(sourceLog, content.toString());
 			}
 			prevName = fullName;
+			prevLang = currLang;
 		}
 		// Deal with last entry
 		// Write back previous document to database
-		database.putDocument(fullName, language, content.toString());
+		database.putDocument(prevName, prevLang, content.toString());
 		appendTo(targetLog, "\n" + prevName + "--------------------\n");
 		appendTo(targetLog, content.toString()); // modified content
 	}

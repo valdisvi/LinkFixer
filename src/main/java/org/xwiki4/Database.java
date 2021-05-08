@@ -62,7 +62,6 @@ public class Database {
 			PreparedStatement preparedStatement = con.prepareStatement(sql);
 			preparedStatement.setString(1, value);
 			preparedStatement.setString(2, fullName);
-			System.err.println('"' + language + '"');
 			if (language != null && !"".equals(language)) {
 				preparedStatement.setString(3, language);
 				preparedStatement.setString(4, language);
