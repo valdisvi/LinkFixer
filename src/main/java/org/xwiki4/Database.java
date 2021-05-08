@@ -14,7 +14,9 @@ public class Database {
 			Class.forName("com.mysql.cj.jdbc.Driver"); // Load the driver class
 
 			// Create connection
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3307/xwiki", "xwiki", "xwiki");
+			con = DriverManager.getConnection(
+					"jdbc:mysql://localhost:3307/xwiki?autoReconnect=true&serverTimezone=UTC&characterEncoding=utf8",
+					"xwiki", "xwiki");
 
 		} catch (Exception e) {
 			log.error(e);
