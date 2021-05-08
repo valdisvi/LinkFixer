@@ -39,7 +39,8 @@ public class Database {
 			}
 			log.trace(preparedStatement);
 			ResultSet rs = preparedStatement.executeQuery();
-			rs.next();
+			if (!rs.next()) // Return, empty if result set is empty
+				return "";
 			traceValues(rs);
 			return rs.getString(fieldName);
 		} catch (Exception e) {

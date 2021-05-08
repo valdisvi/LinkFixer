@@ -6,12 +6,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.junit.Test;
 
 public class LinkFixer {
 
@@ -208,11 +208,9 @@ public class LinkFixer {
 				Integer.parseInt(replacement);
 				content = new StringBuilder(
 						matcher.replaceAll(" " + matcher.group(Integer.parseInt(replacement)) + " "));
-				log.info("Fixed!");
 			} catch (NumberFormatException e) {
 				// not a number just replace
 				content = new StringBuilder(matcher.replaceAll(replacement));
-				log.info("Fixed!");
 			}
 		} catch (IllegalStateException e) {
 			// doesn't match
@@ -336,9 +334,10 @@ public class LinkFixer {
 	 */
 	static String getFullName(String link) {
 		String[] parts = link.split("(/|\\?|#)");
+		System.out.println(Arrays.toString(parts));
 		String fullName = null;
 		for (int i = 1; i < parts.length; i++) {
-			if (!parts[i].contains("=")) {
+			if (!parts[i].matches(".*=.*|^H.*")) {
 				fullName = parts[i - 1] + "." + parts[i];
 			}
 		}
@@ -388,6 +387,10 @@ public class LinkFixer {
 				prevName = currName;
 				prevLang = currLang;
 				content = new StringBuilder(database.getDocument(currName, currLang)); // get content for first entry
+				if ("".equals(content.toString())) {
+					log.warn("Got empty content for " + currName + " " + currLang);
+					continue;
+				}
 				appendTo(sourceLog, "\n" + currName + "--------------------\n");
 				appendTo(sourceLog, content.toString());
 				continue;
@@ -414,6 +417,12 @@ public class LinkFixer {
 				// New document
 				log.debug("New: " + currName + ":" + currLang);
 				content = new StringBuilder(database.getDocument(currName, currLang)); // get new content
+				if ("".equals(content.toString())) {
+					log.warn("Got empty content for " + currName + " " + currLang);
+					prevName = currName;
+					prevLang = currLang;
+					continue;
+				}
 				appendTo(sourceLog, "\n" + currName + "--------------------\n");
 				appendTo(sourceLog, content.toString());
 			}
