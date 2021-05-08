@@ -369,11 +369,13 @@ public class LinkFixer {
 		int i = 0;
 		for (LinkStruct clink : linkList) {
 			currName = getFullName(clink.parentLink);
+			currLang = getLanguage(clink.parentLink);
+			log.info("-----" + currName + " " + currLang + "-----");
 			if (isExcludedPage(currName)) {
 				log.warn(currName + " page is excluded");
 				continue;
 			}
-			currLang = getLanguage(clink.parentLink);
+
 			if (currName == null) {
 				log.error("Couldn't get fullName for: " + clink.parentLink);
 				continue;
