@@ -362,27 +362,19 @@ public class LinkFixer {
 	 */
 	public static void processData(List<LinkStruct> linkList) {
 		Database database = new Database();
-		String currLang = "";
+		String currLang = null;
 		String prevLang = null;
-		String fullName = null;
+		String currName = null;
 		String prevName = null;
 		int i = 0;
 		for (LinkStruct clink : linkList) {
-			fullName = getFullName(clink.parentLink);
-			if (isExcludedPage(fullName)) {
-				log.warn(fullName + " page is excluded");
+			currName = getFullName(clink.parentLink);
+			if (isExcludedPage(currName)) {
+				log.warn(currName + " page is excluded");
 				continue;
 			}
 			currLang = getLanguage(clink.parentLink);
-			if (prevName == null) {
-				prevName = fullName;
-				prevLang = currLang;
-				content = new StringBuilder(database.getDocument(fullName, currLang)); // get content for first entry
-				appendTo(sourceLog, "\n" + fullName + "--------------------\n");
-				appendTo(sourceLog, content.toString());
-				continue;
-			}
-			if (fullName == null) {
+			if (currName == null) {
 				log.error("Couldn't get fullName for: " + clink.parentLink);
 				continue;
 			}
@@ -390,9 +382,17 @@ public class LinkFixer {
 				log.warn("Skipped fixing for: " + clink.parentLink);
 				continue;
 			}
+			if (prevName == null) {
+				prevName = currName;
+				prevLang = currLang;
+				content = new StringBuilder(database.getDocument(currName, currLang)); // get content for first entry
+				appendTo(sourceLog, "\n" + currName + "--------------------\n");
+				appendTo(sourceLog, content.toString());
+				continue;
+			}
 			// continue with current document
-			if (fullName.equals(prevName)) {
-				log.debug(fullName + ": " + i + ": " + clink.realLink);
+			if (currName.equals(prevName)) {
+				log.debug(currName + ": " + i + ": " + clink.realLink);
 				if (!fixAny(clink.url))
 					fixAny(clink.realLink);
 				/*- TODO
@@ -410,12 +410,12 @@ public class LinkFixer {
 				appendTo(targetLog, "\n" + prevName + "--------------------\n");
 				appendTo(targetLog, content.toString()); // modified content
 				// New document
-				log.debug("New: " + fullName + ":" + currLang);
-				content = new StringBuilder(database.getDocument(fullName, currLang)); // get new content
-				appendTo(sourceLog, "\n" + fullName + "--------------------\n");
+				log.debug("New: " + currName + ":" + currLang);
+				content = new StringBuilder(database.getDocument(currName, currLang)); // get new content
+				appendTo(sourceLog, "\n" + currName + "--------------------\n");
 				appendTo(sourceLog, content.toString());
 			}
-			prevName = fullName;
+			prevName = currName;
 			prevLang = currLang;
 		}
 		// Deal with last entry
