@@ -268,7 +268,11 @@ public class LinkFixer {
 		p = Pattern.compile("^\\* *?$", Pattern.MULTILINE);
 		m = p.matcher(content);
 		content = new StringBuilder(m.replaceAll(""));
-
+		// delete ^1._$
+		p = Pattern.compile("^1\\. *?$", Pattern.MULTILINE);
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll(""));
+		
 	}
 
 	/**
@@ -334,7 +338,6 @@ public class LinkFixer {
 	 */
 	static String getFullName(String link) {
 		String[] parts = link.split("(/|\\?|#)");
-		System.out.println(Arrays.toString(parts));
 		String fullName = null;
 		for (int i = 1; i < parts.length; i++) {
 			if (!parts[i].matches(".*=.*|^H.*")) {
@@ -369,7 +372,7 @@ public class LinkFixer {
 		for (LinkStruct clink : linkList) {
 			currName = getFullName(clink.parentLink);
 			currLang = getLanguage(clink.parentLink);
-			log.info("-----" + currName + " " + currLang + "-----");
+			log.info("----- " + currName + " " + currLang + " -----");
 			if (isExcludedPage(currName)) {
 				log.warn(currName + " page is excluded");
 				continue;
