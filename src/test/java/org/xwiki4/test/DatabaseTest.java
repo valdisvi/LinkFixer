@@ -29,8 +29,10 @@ public class DatabaseTest {
 		assertEquals(content1, db.getDocument("Main.WebHome", "lv"));
 		db.putDocument("Main.WebHome", "en", content2);
 		assertEquals(content2, db.getDocument("Main.WebHome", "en"));
-		db.putDocument("Main.WebHome", "ru", content3);
-		assertEquals(content3, db.getDocument("Main.WebHome", "ru"));
+		// Test get/put without language
+		content3 = db.getDocument("Blog.201207", "");
+		db.putDocument("Blog.201207", "", content3);
+		assertEquals(content3, db.getDocument("Blog.201207", ""));
 	}
 
 }
