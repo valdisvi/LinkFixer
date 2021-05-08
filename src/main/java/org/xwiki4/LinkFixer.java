@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
 
 public class LinkFixer {
 
@@ -19,6 +20,23 @@ public class LinkFixer {
 	private static final String pagePrefix = "odo.lv";
 	private static final String sourceLog = "logs/source.log";
 	private static final String targetLog = "logs/target.log";
+	private static final String[] excludePages = { //
+			"Training.JavaSecurityWorkshop", //
+			"Training.NewInformaticsLectures", //
+			"Recipes.Apache", //
+			"Recipes.Bubba", //
+			"Recipes.Gitweb", //
+			"Recipes.HTSEngine", //
+			"Recipes.IP6", //
+			"Recipes.Jforum", //
+			"Recipes.Limesurvey", //
+			"Recipes.Piwik", //
+			"Recipes.Postfix", //
+			"Recipes.SquidReverseProxy", //
+			"Main.qtp_home_en", //
+			"Main.LatvianKeyboard4", //
+			"Recipes.JdeveloperWindows" //
+	};
 
 	/**
 	 * fix plain implicit url — remove it
@@ -205,9 +223,9 @@ public class LinkFixer {
 		Pattern p;
 		Matcher m;
 		// delete _.
-		p = Pattern.compile(" +\\.");
+		p = Pattern.compile(" +\\.(\\W)");
 		m = p.matcher(content);
-		content = new StringBuilder(m.replaceAll("."));
+		content = new StringBuilder(m.replaceAll(".$1"));
 		// delete _,
 		p = Pattern.compile(" +,");
 		m = p.matcher(content);
@@ -228,18 +246,31 @@ public class LinkFixer {
 		p = Pattern.compile("\\[ +");
 		m = p.matcher(content);
 		content = new StringBuilder(m.replaceAll("["));
+		// Fix link https:~~/~~/
+		p = Pattern.compile("https:~+/~+/");
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll("https://"));
+		// Fix link http:~~/~~/
+		p = Pattern.compile("http:~+/~+/");
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll("http://"));
+		// Fix link http:~/
+		p = Pattern.compile("http:~+/");
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll("http:/"));
 		// delete ^_
-		p = Pattern.compile("^ +");
+		p = Pattern.compile("^ +", Pattern.MULTILINE);
 		m = p.matcher(content);
 		content = new StringBuilder(m.replaceAll(""));
 		// delete _$
-		p = Pattern.compile(" +$");
-		m = p.matcher(content);
-		content = new StringBuilder(m.replaceAll("\n"));
-		// delete ^*_
-		p = Pattern.compile("^\\*\\s+?$");
+		p = Pattern.compile(" +$", Pattern.MULTILINE);
 		m = p.matcher(content);
 		content = new StringBuilder(m.replaceAll(""));
+		// delete ^*_$
+		p = Pattern.compile("^\\* *?$", Pattern.MULTILINE);
+		m = p.matcher(content);
+		content = new StringBuilder(m.replaceAll(""));
+
 	}
 
 	/**
@@ -316,6 +347,14 @@ public class LinkFixer {
 		return fullName;
 	}
 
+	static boolean isExcludedPage(String fullName) {
+		for (String excluded : excludePages) {
+			if (fullName.equals(excluded))
+				return true;
+		}
+		return false;
+	}
+
 	/**
 	 * combination of reading/link fixing/writing
 	 * 
@@ -329,6 +368,10 @@ public class LinkFixer {
 		int i = 0;
 		for (LinkStruct clink : linkList) {
 			fullName = getFullName(clink.parentLink);
+			if (isExcludedPage(fullName)) {
+				log.warn(fullName + " page is excluded");
+				continue;
+			}
 			language = getLanguage(clink.parentLink);
 			if (prevName == null) {
 				prevName = fullName;
@@ -359,9 +402,13 @@ public class LinkFixer {
 				i++;
 			} else { // Finish previous and start new document
 				i = 0;
-				log.debug("New: " + fullName + ":" + language);
+				// Write back previous document to database
+				database.putDocument(fullName, language, content.toString());
+				// Log changes
 				appendTo(targetLog, "\n" + prevName + "--------------------\n");
 				appendTo(targetLog, content.toString()); // modified content
+				// New document
+				log.debug("New: " + fullName + ":" + language);
 				content = new StringBuilder(database.getDocument(fullName, language)); // get new content
 				appendTo(sourceLog, "\n" + fullName + "--------------------\n");
 				appendTo(sourceLog, content.toString());
@@ -369,6 +416,8 @@ public class LinkFixer {
 			prevName = fullName;
 		}
 		// Deal with last entry
+		// Write back previous document to database
+		database.putDocument(fullName, language, content.toString());
 		appendTo(targetLog, "\n" + prevName + "--------------------\n");
 		appendTo(targetLog, content.toString()); // modified content
 	}
@@ -440,5 +489,14 @@ public class LinkFixer {
 			log.error(e);
 		}
 		return result;
+	}
+
+	/**
+	 * Start fixing links here!
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		LinkFixer.getLinkFixer("/home/valdis/Lejupielādes/linkchecker.html");
 	}
 }
