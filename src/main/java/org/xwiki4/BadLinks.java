@@ -10,10 +10,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import static org.xwiki4.LinkFixer.getFullName;
+import static org.xwiki4.LinkFixer.isInList;
 
 public class BadLinks {
-
-
 
 	private List<LinkStruct> linkList = new LinkedList<>();
 
@@ -59,6 +59,52 @@ public class BadLinks {
 	@Override
 	public String toString() {
 		return linkList.toString().replace("[", "").replace("]", "\n").replace(", ", "\n");
+	}
+
+	public static void main(String[] args) {
+		String[] badPages = { "Main.LatvianKeyboard4", //
+				"Main.qtp_home_en", //
+				"Recipes.Apache", //
+				"Recipes.Bubba", //
+				"Recipes.Gitweb", //
+				"Recipes.IP6", //
+				"Recipes.JdeveloperWindows", //
+				"Recipes.Jforum", //
+				"Recipes.Limesurvey", //
+				"Recipes.Piwik", //
+				"Recipes.Postfix", //
+				"Recipes.SquidReverseProxy", //
+				"Training.NewInformaticsLectures", //
+				"Blog.", //
+				"Blog.Darbi", //
+				"Challenges.", //
+				"Main.LedgerSMB", //
+				"Main.Recipes" //
+		};
+		BadLinks badLinks = new BadLinks();
+		try {
+			File file = new File("/home/valdis/Lejupielādes/linkchecker.html");
+			badLinks.findLinks(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String prevName = null;
+		String currName = null;
+		LinkStruct prevStr = null;
+		for (LinkStruct currStr : badLinks.getLinks()) {
+			currName = getFullName(currStr.parentLink);
+			if (isInList(currName, badPages)) {
+				System.out.println(">" + currName);
+				if (!currName.equals(prevName)) {
+					System.out.println("\t1 " + prevStr.parentLink + " " + prevStr.realLink);
+					System.out.println("1" + currName + ": " + currStr.parentLink);
+				} else {
+					System.out.println("\t2 " + currStr.realLink);
+				}
+			}
+			prevName = currName;
+			prevStr = currStr;
+		}
 	}
 
 }

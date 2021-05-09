@@ -272,7 +272,7 @@ public class LinkFixer {
 		p = Pattern.compile("^1\\. *?$", Pattern.MULTILINE);
 		m = p.matcher(content);
 		content = new StringBuilder(m.replaceAll(""));
-		
+
 	}
 
 	/**
@@ -305,7 +305,6 @@ public class LinkFixer {
 			linkList = badLinks.getLinks();
 			log.debug("XWiki broken links count:" + badLinks.getErrorCount());
 			processData(linkList);
-			log.info("Done fixing!");
 		} catch (IOException e) {
 			log.error("LinkFixer exception!" + e);
 		}
@@ -349,8 +348,8 @@ public class LinkFixer {
 		return fullName;
 	}
 
-	static boolean isExcludedPage(String fullName) {
-		for (String excluded : excludePages) {
+	static boolean isInList(String fullName, String[] list) {
+		for (String excluded : list) {
 			if (fullName.equals(excluded))
 				return true;
 		}
@@ -373,7 +372,7 @@ public class LinkFixer {
 			currName = getFullName(clink.parentLink);
 			currLang = getLanguage(clink.parentLink);
 			log.info("----- " + currName + " " + currLang + " -----");
-			if (isExcludedPage(currName)) {
+			if (isInList(currName, excludePages)) {
 				log.warn(currName + " page is excluded");
 				continue;
 			}
@@ -514,6 +513,8 @@ public class LinkFixer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		log.info("Started fixing!");
 		LinkFixer.getLinkFixer("/home/valdis/Lejupielādes/linkchecker.html");
+		log.info("Finished fixing!");
 	}
 }
